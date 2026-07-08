@@ -1,24 +1,14 @@
 import bcrypt from "bcryptjs";
-import { User } from "../users/user.model";
+import { UserRepository } from "../users/user.repository";
 
-export async function registerUser(
-    username: string,
-    email: string,
-    password: string
-) {
-    const existingUser = await User.findOne({ email });
+export class AuthService {
+    constructor(private userRepo: UserRepository = new UserRepository()) { }
 
-    if (existingUser) {
-        throw new Error("Email already exists");
+    async registerUser(username: string, email: string, password: string) {
+        const existingUser = await this.userRepo.findOne({ email });
+        if (existingUser) throw new Error("Email already exists");
+
+        const password_hashed = await bcrypt.hash(password, 10);
+        return this.userRepo.create({ username, email, password: password_hashed });
     }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-        username,
-        email,
-        passwordHash
-    });
-
-    return user;
 }

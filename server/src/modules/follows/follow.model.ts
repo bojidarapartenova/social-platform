@@ -9,8 +9,8 @@ export interface IFollow extends Document {
 
 const followSchema = new Schema<IFollow>(
     {
-        followerId: { type: Schema.Types.ObjectId, ref: User, required: true },
-        followingId: { type: Schema.Types.ObjectId, ref: User, required: true }
+        followerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        followingId: { type: Schema.Types.ObjectId, ref: "User", required: true }
     },
     {
         timestamps: { createdAt: true, updatedAt: false }
