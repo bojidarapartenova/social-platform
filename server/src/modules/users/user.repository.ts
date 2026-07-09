@@ -11,4 +11,7 @@ export class UserRepository implements IRepository<IUser> {
     create(data: Partial<IUser>) {
         return User.create(data);
     }
+    updateById(id: string, data: Partial<IUser>) {
+        return User.findByIdAndUpdate(id, data, { new: true }).exec();
+    }
 }
