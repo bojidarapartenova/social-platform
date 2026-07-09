@@ -1,0 +1,31 @@
+import { useEffect, useRef } from "react";
+import { getFilterStrategy } from "./filters/filterStrategy";
+
+export function FilteredImage({ src, filter }: { src: string; filter: string }) {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+            return;
+        }
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+            return;
+        }
+
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+
+            const strategy = getFilterStrategy(filter);
+            strategy.apply(ctx);
+        };
+        img.src = src;
+    }, [src, filter]);
+
+    return <canvas ref={canvasRef} style={{ maxWidth: "100%", display: "block" }} />;
+}
