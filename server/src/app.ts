@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./modules/auth/auth.routes";
 import userRoutes from "./modules/users/user.routes";
 import followRoutes from "./modules/follows/follow.routes"
+import postRoutes from "./modules/posts/post.routes";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
 });
 app.use("/api/users", userRoutes);
-app.use("/api/follows", followRoutes)
+app.use("/api/follows", followRoutes);
+app.use("/api/posts", postRoutes);
 
 export default app;
