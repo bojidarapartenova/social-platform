@@ -26,3 +26,13 @@ export async function followUser(followerId: string, followingId: string) {
         );
     }
 }
+
+export async function unfollowUser(followerId: string, followingId: string) {
+    const followerObjId = new Types.ObjectId(followerId);
+    const followingObjId = new Types.ObjectId(followingId);
+
+    await Follow.deleteOne({ followerId: followerObjId, followingId: followingObjId });
+
+    const [userAId, userBId] = sortedPair(followerObjId, followingObjId);
+    await Friendship.deleteOne({ userAId, userBId });
+}
