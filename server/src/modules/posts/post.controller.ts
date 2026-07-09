@@ -19,10 +19,10 @@ export async function createPost(req: Request, res: Response) {
 export async function getPost(req: Request<{ id: string }>, res: Response) {
     try {
         const post = await postService.getPostById(req.params.id);
-        res.status(201).json(post);
+        res.status(200).json(post);
     }
     catch (error: any) {
-        res.status(400).json({ message: error.message });
+        res.status(404).json({ message: error.message });
     }
 }
 
@@ -32,7 +32,7 @@ export async function getFeed(req: Request, res: Response) {
         const following = await Follow.find({ followerId: userId }).select("followingId");
         const followingIds = following.map((f) => f.followingId.toString());
         const posts = await postService.getFeed(userId, followingIds);
-        res.status(201).json(posts);
+        res.status(200).json(posts);
     }
     catch (error: any) {
         res.status(400).json({ message: error.message });
