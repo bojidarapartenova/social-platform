@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
-import { error } from "node:console";
 
 const authService = new AuthService();
 

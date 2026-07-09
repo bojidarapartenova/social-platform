@@ -2,7 +2,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserRepository } from "../users/user.repository";
 import { env } from "../../config/env";
-import { Error } from "mongoose";
 
 export class AuthService {
     constructor(private userRepo: UserRepository = new UserRepository()) { }

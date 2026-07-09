@@ -1,5 +1,4 @@
 import { Schema, model, Document, Types } from "mongoose";
-import { User } from "../users/user.model";
 
 export interface IFollow extends Document {
     followerId: Types.ObjectId,
