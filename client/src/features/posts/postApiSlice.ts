@@ -2,10 +2,10 @@ import { apiSlice } from "../../app/apiSlice";
 
 export interface Post {
     _id: string;
-    authorId: string;
+    authorId: { _id: string; username: string; name?: string; avatarUrl?: string };
     type: "photo" | "text";
     caption: string;
-    mediaUrl: string;
+    mediaUrls: string[];
     filter: "none" | "negative" | "blur" | "sobel";
     groupId: string | null;
     createdAt: string;
@@ -14,7 +14,7 @@ export interface Post {
 interface CreatePostInput {
     type: "photo" | "text";
     caption?: string;
-    mediaUrl?: string;
+    mediaUrls?: string[];
     filter?: "none" | "negative" | "blur" | "sobel";
 }
 

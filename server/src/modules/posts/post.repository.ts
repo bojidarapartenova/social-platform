@@ -20,4 +20,11 @@ export class PostRepository implements IRepository<IPost> {
     findMany(filter: any, limit = 20) {
         return Post.find(filter).sort({ createdAt: -1 }).limit(limit).exec();
     }
+    findManyWithAuthor(filter: any, limit = 20) {
+        return Post.find(filter)
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .populate("authorId", "username avatarUrl name")
+            .exec();
+    }
 }
