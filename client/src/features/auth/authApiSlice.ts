@@ -6,6 +6,7 @@ interface LoginInput {
 }
 
 interface RegisterInput {
+    name?: string
     username: string;
     email: string;
     password: string;
@@ -13,7 +14,7 @@ interface RegisterInput {
 
 interface AuthResponse {
     token: string;
-    user: { _id: string; username: string; role: string };
+    user: { _id: string; name?: string; username: string; role: string };
 }
 
 export const authApiSlice = apiSlice.injectEndpoints({

@@ -6,14 +6,14 @@ import { env } from "../../config/env";
 export class AuthService {
     constructor(private userRepo: UserRepository = new UserRepository()) { }
 
-    async registerUser(username: string, email: string, password: string) {
+    async registerUser(name: string, username: string, email: string, password: string) {
         const existingUser = await this.userRepo.findOne({ email });
         if (existingUser) {
             throw new Error("Email already exists");
         }
 
         const password_hashed = await bcrypt.hash(password, 10);
-        const user = await this.userRepo.create({ username, email, password: password_hashed });
+        const user = await this.userRepo.create({ name, username, email, password: password_hashed });
 
         const { password: _, ...safeUser } = user.toObject();
         return safeUser;

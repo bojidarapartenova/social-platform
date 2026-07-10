@@ -3,6 +3,7 @@ import * as yup from "yup";
 const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{10,}$/;
 
 export const registerSchema = yup.object({
+    name: yup.string().max(50).default(""),
     username: yup.string().min(3).required(),
     email: yup.string().email("Must be a valid email address").required(),
     password: yup

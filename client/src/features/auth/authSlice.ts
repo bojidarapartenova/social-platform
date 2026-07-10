@@ -3,6 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthUser {
     _id: string;
+    name: string;
     username: string;
     role: string;
 }
