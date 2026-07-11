@@ -4,9 +4,10 @@ import type { RootState } from "../../app/store";
 import { FilteredImage } from "../feed/FilteredImage";
 import {
     useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation,
-    useUpdatePostMutation, useDeletePostMutation,
+    useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation
 } from "./postApiSlice";
 import type { Post } from "./postApiSlice";
+import { Link } from "react-router-dom";
 
 export function PostCard({ post }: { post: Post }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
@@ -24,6 +25,7 @@ export function PostCard({ post }: { post: Post }) {
     const { data: comments } = useGetCommentsQuery(post._id, { skip: !showComments });
     const [commentText, setCommentText] = useState("");
     const [addComment] = useAddCommentMutation();
+    const [toggleFavorite] = useToggleFavoriteMutation();
 
     async function handleSaveEdit() {
         await updatePost({ id: post._id, data: { caption: editCaption } });
@@ -47,8 +49,10 @@ export function PostCard({ post }: { post: Post }) {
     return (
         <div className="post">
             <div className="postHeader">
-                <img src={post.authorId.avatarUrl || "/default-avatar.png"} alt={post.authorId.username} />
-                <span>{post.authorId.username}</span>
+                <Link to={`/profile/${post.authorId._id}`} className="postAuthorLink">
+                    <img src={post.authorId.avatarUrl || "/default-avatar.png"} alt={post.authorId.username} />
+                    <span>{post.authorId.username}</span>
+                </Link>
 
                 {isOwner && (
                     <div className="postMenu">
@@ -89,10 +93,17 @@ export function PostCard({ post }: { post: Post }) {
                     className={post.likedByMe ? "actionBtn liked" : "actionBtn"}
                     onClick={() => toggleLike(post._id)}
                 >
-                    ♥ {post.likeCount}
+                    {post.likedByMe ? "♥" : "♡"} {post.likeCount}
                 </button>
                 <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)}>
                     💬 {post.commentCount}
+                </button>
+                <button
+                    type="button"
+                    className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"}
+                    onClick={() => toggleFavorite(post._id)}
+                >
+                    {post.favoritedByMe ? "★" : "☆"}
                 </button>
             </div>
 

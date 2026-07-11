@@ -47,4 +47,8 @@ export class PostService {
         if (post.authorId.toString() !== requesterId) throw new Error("Forbidden");
         return this.postRepo.updateById(id, data as any);
     }
+
+    async getPostsByAuthor(authorId: string) {
+        return this.postRepo.findManyWithAuthor({ authorId, groupId: null });
+    }
 }

@@ -24,6 +24,7 @@ export interface Post {
     likeCount: number;
     commentCount: number;
     likedByMe: boolean;
+    favoritedByMe: boolean
 }
 
 interface CreatePostInput {
@@ -77,10 +78,26 @@ export const postApiSlice = apiSlice.injectEndpoints({
             query: ({ postId, text }) => ({ url: `/posts/${postId}/comments`, method: "POST", body: { text } }),
             invalidatesTags: (_result, _error, { postId }) => [{ type: "Comment", id: postId }, "Post"],
         }),
+        deleteComment: builder.mutation<{ message: string }, { id: string; postId: string }>({
+            query: ({ id }) => ({ url: `/comments/${id}`, method: "DELETE" }),
+            invalidatesTags: (_r, _e, { postId }) => [{ type: "Comment", id: postId }, "Post"],
+        }),
+        toggleFavorite: builder.mutation<{ favorited: boolean }, string>({
+            query: (postId) => ({ url: `/posts/${postId}/favorites`, method: "POST" }),
+            async onQueryStarted(postId, { dispatch, queryFulfilled }) {
+                const patch = dispatch(
+                    postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
+                        const post = draft.find((p) => p._id === postId);
+                        if (post) post.favoritedByMe = !post.favoritedByMe;
+                    })
+                );
+                try { await queryFulfilled; } catch { patch.undo(); }
+            },
+        }),
     }),
 });
 
 export const {
     useGetFeedQuery, useCreatePostMutation, useUpdatePostMutation, useDeletePostMutation,
-    useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation,
+    useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation, useToggleFavoriteMutation, useDeleteCommentMutation
 } = postApiSlice;

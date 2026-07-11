@@ -5,6 +5,7 @@ import { addComment, getComments } from "./comment.controller";
 import { requireAuth } from "../../common/middleware/auth.middleware";
 import { validate } from "../../common/middleware/validate.middleware";
 import { createPostSchema } from "./post.validation";
+import { toggleFavorite } from "./bookmark.controller";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.delete("/:id", requireAuth, deletePost);
 router.post("/:postId/likes", requireAuth, toggleLike);
 router.post("/:postId/comments", requireAuth, addComment);
 router.get("/:postId/comments", getComments);
+router.post("/:postId/favorites", requireAuth, toggleFavorite);
 
 export default router;
