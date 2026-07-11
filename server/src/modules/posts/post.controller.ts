@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
 import { Follow } from "../follows/follow.model";
+import { Like } from "./like.model";
+import { Comment } from "./comment.model";
 
 const postService = new PostService();
 
@@ -32,9 +34,20 @@ export async function getFeed(req: Request, res: Response) {
         const following = await Follow.find({ followerId: userId }).select("followingId");
         const followingIds = following.map((f) => f.followingId.toString());
         const posts = await postService.getFeed(userId, followingIds);
-        res.status(200).json(posts);
-    }
-    catch (error: any) {
+
+        const decorated = await Promise.all(
+            posts.map(async (post) => {
+                const [likeCount, commentCount, likedByMe] = await Promise.all([
+                    Like.countDocuments({ postId: post._id }),
+                    Comment.countDocuments({ postId: post._id }),
+                    Like.exists({ postId: post._id, userId }),
+                ]);
+                return { ...post.toObject(), likeCount, commentCount, likedByMe: !!likedByMe };
+            })
+        );
+
+        res.status(200).json(decorated);
+    } catch (error: any) {
         res.status(400).json({ message: error.message });
     }
 }
@@ -45,6 +58,15 @@ export async function deletePost(req: Request<{ id: string }>, res: Response) {
         res.status(200).json({ message: "Post deleted" });
     }
     catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function updatePost(req: Request<{ id: string }>, res: Response) {
+    try {
+        const post = await postService.updatePost(req.params.id, req.user!.userId, req.body);
+        res.status(200).json(post);
+    } catch (error: any) {
         res.status(400).json({ message: error.message });
     }
 }

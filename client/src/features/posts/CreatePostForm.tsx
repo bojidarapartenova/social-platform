@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useCreatePostMutation } from "./postApiSlice";
 import { setType, setCaption, setMediaUrlAt, addMediaField, removeMediaAt, setEditingIndex, resetDraft } from "./postDraftSlice";
+import { useState } from "react";
 import "../../styles/postForm.css";
 
 export function CreatePostForm() {
@@ -10,14 +11,26 @@ export function CreatePostForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [createPost, { isLoading, error }] = useCreatePostMutation();
+    const [formError, setFormError] = useState("");
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        try {
-            const cleanedMedia = draft.media
-                .map((m) => ({ ...m, url: m.url.trim() }))
-                .filter((m) => m.url);
+        setFormError("");
 
+        const cleanedMedia = draft.media
+            .map((m) => ({ ...m, url: m.url.trim() }))
+            .filter((m) => m.url);
+
+        if (draft.type === "text" && !draft.caption.trim()) {
+            setFormError("Post cannot be empty.");
+            return;
+        }
+        if (draft.type === "photo" && cleanedMedia.length === 0) {
+            setFormError("Add at least one image.");
+            return;
+        }
+
+        try {
             await createPost({
                 type: draft.type,
                 caption: draft.caption,
@@ -26,6 +39,7 @@ export function CreatePostForm() {
             dispatch(resetDraft());
             navigate("/");
         } catch {
+            setFormError("Something went wrong creating your post.");
         }
     }
 
@@ -77,7 +91,7 @@ export function CreatePostForm() {
                 )}
 
                 <button type="submit" disabled={isLoading}>Post</button>
-                {error && <p>Something went wrong creating your post.</p>}
+                {formError && <p>{formError}</p>}
             </form>
         </div>
     );

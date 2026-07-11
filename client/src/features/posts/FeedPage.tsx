@@ -1,5 +1,5 @@
 import { useGetFeedQuery } from "./postApiSlice";
-import { FilteredImage } from "../feed/FilteredImage";
+import { PostCard } from "./PostCard";
 import { Link } from "react-router-dom";
 import "../../styles/feed.css";
 
@@ -16,28 +16,7 @@ export function FeedPage() {
             <div className="postList">
                 {isLoading && <p>Loading feed...</p>}
                 {error && <p>Couldn't load the feed.</p>}
-
-                {posts?.map((post) => (
-                    <div key={post._id} className="post">
-                        <div className="postHeader">
-                            <img
-                                src={post.authorId.avatarUrl || "/default-avatar.png"}
-                                alt={post.authorId.username}
-                            />
-                            <Link to="/profile"><span>{post.authorId.username}</span></Link>
-                        </div>
-
-                        <p className="postCaption">{post.caption}</p>
-
-                        {post.type === "photo" && post.media?.length > 0 && (
-                            <div className="mediaScroll">
-                                {post.media.map((item, i) => (
-                                    <FilteredImage key={i} src={item.url} filter={item.filter} />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                ))}
+                {posts?.map((post) => <PostCard key={post._id} post={post} />)}
             </div>
         </div>
     );

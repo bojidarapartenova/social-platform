@@ -40,4 +40,11 @@ export class PostService {
         if (post.authorId.toString() !== requesterId) throw new Error("Forbidden");
         await this.postRepo.deleteById(id);
     }
+
+    async updatePost(id: string, requesterId: string, data: Partial<CreatePostInput>) {
+        const post = await this.postRepo.findById(id);
+        if (!post) throw new Error("Post not found");
+        if (post.authorId.toString() !== requesterId) throw new Error("Forbidden");
+        return this.postRepo.updateById(id, data as any);
+    }
 }
