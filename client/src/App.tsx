@@ -4,6 +4,7 @@ import RegisterPage from "./features/auth/RegisterPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import { FeedPage } from "./features/posts/FeedPage";
 import { CreatePostForm } from "./features/posts/CreatePostForm";
+import { FilterPreviewPage } from "./features/posts/FilterPreviewPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<FeedPage />} />
         </Route>
         <Route path="/create" element={<CreatePostForm />} />
+        <Route path="/create/filters" element={<FilterPreviewPage />} />
       </Routes>
     </BrowserRouter>
   );

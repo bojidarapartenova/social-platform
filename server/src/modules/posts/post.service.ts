@@ -1,11 +1,10 @@
 import { PostRepository } from "./post.repository";
-import { PostType, FilterName } from "./post.model";
+import { PostType, IMediaItem } from "./post.model";
 
 interface CreatePostInput {
     type: PostType;
     caption?: string;
-    mediaUrls?: string[];
-    filter?: FilterName;
+    media?: IMediaItem[];
     groupId?: string | null;
 }
 
@@ -17,8 +16,7 @@ export class PostService {
             authorId,
             type: data.type,
             caption: data.caption ?? "",
-            mediaUrls: data.mediaUrls ?? [],
-            appliedFilter: data.filter ?? "none",
+            media: data.media ?? [],
             groupId: data.groupId || null,
         } as any);
     }

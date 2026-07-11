@@ -29,10 +29,10 @@ export function FeedPage() {
 
                         <p className="postCaption">{post.caption}</p>
 
-                        {post.type === "photo" && post.mediaUrls?.length > 0 && (
+                        {post.type === "photo" && post.media?.length > 0 && (
                             <div className="mediaScroll">
-                                {post.mediaUrls.map((url, i) => (
-                                    <FilteredImage key={i} src={url} filter={post.filter} />
+                                {post.media.map((item, i) => (
+                                    <FilteredImage key={i} src={item.url} filter={item.filter} />
                                 ))}
                             </div>
                         )}

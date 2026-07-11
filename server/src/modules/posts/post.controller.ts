@@ -7,8 +7,8 @@ const postService = new PostService();
 export async function createPost(req: Request, res: Response) {
     try {
         const authorId = req.user!.userId;
-        const { type, caption, mediaUrls, filter, groupId } = req.body;
-        const post = await postService.createPost(authorId, { type, caption, mediaUrls, filter, groupId });
+        const { type, caption, media, groupId } = req.body;
+        const post = await postService.createPost(authorId, { type, caption, media, groupId });
         res.status(201).json(post);
     }
     catch (error: any) {

@@ -1,12 +1,16 @@
 import { apiSlice } from "../../app/apiSlice";
 
+export interface MediaItem {
+    url: string;
+    filter: "none" | "negative" | "blur" | "sobel";
+}
+
 export interface Post {
     _id: string;
     authorId: { _id: string; username: string; name?: string; avatarUrl?: string };
     type: "photo" | "text";
     caption: string;
-    mediaUrls: string[];
-    filter: "none" | "negative" | "blur" | "sobel";
+    media: MediaItem[];
     groupId: string | null;
     createdAt: string;
 }
@@ -14,8 +18,7 @@ export interface Post {
 interface CreatePostInput {
     type: "photo" | "text";
     caption?: string;
-    mediaUrls?: string[];
-    filter?: "none" | "negative" | "blur" | "sobel";
+    media?: MediaItem[];
 }
 
 export const postApiSlice = apiSlice.injectEndpoints({
