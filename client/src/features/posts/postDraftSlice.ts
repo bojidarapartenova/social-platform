@@ -9,16 +9,14 @@ export interface MediaItem {
 }
 
 interface PostDraftState {
-    type: "text" | "photo";
     caption: string;
     media: MediaItem[];
     editingIndex: number | null;
 }
 
 const initialState: PostDraftState = {
-    type: "text",
     caption: "",
-    media: [{ url: "", filter: "none" }],
+    media: [],
     editingIndex: null,
 };
 
@@ -26,9 +24,6 @@ const postDraftSlice = createSlice({
     name: "postDraft",
     initialState,
     reducers: {
-        setType(state, action: PayloadAction<"text" | "photo">) {
-            state.type = action.payload;
-        },
         setCaption(state, action: PayloadAction<string>) {
             state.caption = action.payload;
         },
@@ -54,7 +49,7 @@ const postDraftSlice = createSlice({
 });
 
 export const {
-    setType, setCaption, setMediaUrlAt, setMediaFilterAt,
+    setCaption, setMediaUrlAt, setMediaFilterAt,
     addMediaField, removeMediaAt, setEditingIndex, resetDraft,
 } = postDraftSlice.actions;
 

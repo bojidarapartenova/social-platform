@@ -35,8 +35,8 @@ interface CreatePostInput {
 
 export const postApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getFeed: builder.query<Post[], void>({
-            query: () => "/posts/feed",
+        getFeed: builder.query<Post[], "all" | "following" | void>({
+            query: (scope) => `/posts/feed?scope=${scope ?? "all"}`,
             providesTags: ["Post"],
         }),
         createPost: builder.mutation<Post, CreatePostInput>({
@@ -51,8 +51,21 @@ export const postApiSlice = apiSlice.injectEndpoints({
             query: (id) => ({ url: `/posts/${id}`, method: "DELETE" }),
             invalidatesTags: ["Post"],
         }),
+        getComments: builder.query<Comment[], string>({
+            query: (postId) => `/posts/${postId}/comments`,
+            providesTags: (_result, _error, postId) => [{ type: "Comment", id: postId }],
+        }),
+        addComment: builder.mutation<Comment, { postId: string; text: string }>({
+            query: ({ postId, text }) => ({ url: `/posts/${postId}/comments`, method: "POST", body: { text } }),
+            invalidatesTags: (_result, _error, { postId }) => [{ type: "Comment", id: postId }, "Post"],
+        }),
+        deleteComment: builder.mutation<{ message: string }, { id: string; postId: string }>({
+            query: ({ id }) => ({ url: `/comments/${id}`, method: "DELETE" }),
+            invalidatesTags: (_r, _e, { postId }) => [{ type: "Comment", id: postId }, "Post"],
+        }),
         toggleLike: builder.mutation<{ liked: boolean; likeCount: number }, string>({
             query: (postId) => ({ url: `/posts/${postId}/likes`, method: "POST" }),
+            invalidatesTags: ["Post"],
             async onQueryStarted(postId, { dispatch, queryFulfilled }) {
                 const patch = dispatch(
                     postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
@@ -70,20 +83,10 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 }
             },
         }),
-        getComments: builder.query<Comment[], string>({
-            query: (postId) => `/posts/${postId}/comments`,
-            providesTags: (_result, _error, postId) => [{ type: "Comment", id: postId }],
-        }),
-        addComment: builder.mutation<Comment, { postId: string; text: string }>({
-            query: ({ postId, text }) => ({ url: `/posts/${postId}/comments`, method: "POST", body: { text } }),
-            invalidatesTags: (_result, _error, { postId }) => [{ type: "Comment", id: postId }, "Post"],
-        }),
-        deleteComment: builder.mutation<{ message: string }, { id: string; postId: string }>({
-            query: ({ id }) => ({ url: `/comments/${id}`, method: "DELETE" }),
-            invalidatesTags: (_r, _e, { postId }) => [{ type: "Comment", id: postId }, "Post"],
-        }),
+
         toggleFavorite: builder.mutation<{ favorited: boolean }, string>({
             query: (postId) => ({ url: `/posts/${postId}/favorites`, method: "POST" }),
+            invalidatesTags: ["Post"],
             async onQueryStarted(postId, { dispatch, queryFulfilled }) {
                 const patch = dispatch(
                     postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
@@ -93,7 +96,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 );
                 try { await queryFulfilled; } catch { patch.undo(); }
             },
-        }),
+        })
     }),
 });
 

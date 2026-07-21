@@ -7,8 +7,20 @@ function sortedPair(a: Types.ObjectId, b: Types.ObjectId) {
 }
 
 export async function followUser(followerId: string, followingId: string) {
+    if (followerId === followingId) {
+        throw new Error("You can't follow yourself");
+    }
+
     const followerObjId = new Types.ObjectId(followerId);
     const followingObjId = new Types.ObjectId(followingId);
+
+    const alreadyFollowing = await Follow.exists({
+        followerId: followerObjId,
+        followingId: followingObjId,
+    });
+    if (alreadyFollowing) {
+        return;
+    }
 
     await Follow.create({ followerId: followerObjId, followingId: followingObjId });
 

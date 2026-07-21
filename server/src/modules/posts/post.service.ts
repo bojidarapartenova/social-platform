@@ -27,11 +27,8 @@ export class PostService {
         return post;
     }
 
-    async getFeed(userId: string, followingIds: string[]) {
-        return this.postRepo.findManyWithAuthor({
-            authorId: { $in: [userId, ...followingIds] },
-            groupId: null,
-        });
+    async getFeed() {
+        return this.postRepo.findManyWithAuthor({ groupId: null });
     }
 
     async deletePost(id: string, requesterId: string) {
@@ -50,5 +47,12 @@ export class PostService {
 
     async getPostsByAuthor(authorId: string) {
         return this.postRepo.findManyWithAuthor({ authorId, groupId: null });
+    }
+
+    async getFollowingFeed(userId: string, followingIds: string[]) {
+        return this.postRepo.findManyWithAuthor({
+            authorId: { $in: [userId, ...followingIds] },
+            groupId: null,
+        });
     }
 }

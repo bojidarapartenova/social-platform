@@ -6,6 +6,7 @@ interface AuthUser {
     name: string;
     username: string;
     role: string;
+    avatarUrl?: string;
 }
 
 interface AuthState {

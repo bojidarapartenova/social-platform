@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { PostService } from "./post.service";
-import { Follow } from "../follows/follow.model";
 import { Like } from "./like.model";
 import { Comment } from "./comment.model";
+import { Bookmark } from "./bookmark.model";
+import { Follow } from "../follows/follow.model";
 
 const postService = new PostService();
 
@@ -28,24 +29,46 @@ export async function getPost(req: Request<{ id: string }>, res: Response) {
     }
 }
 
+async function decoratePosts(posts: any[], userId?: string) {
+    return Promise.all(
+        posts.map(async (post) => {
+            const [likeCount, commentCount, likedByMe, favoritedByMe] = await Promise.all([
+                Like.countDocuments({ postId: post._id }),
+                Comment.countDocuments({ postId: post._id }),
+                userId ? Like.exists({ postId: post._id, userId }) : false,
+                userId ? Bookmark.exists({ postId: post._id, userId }) : false,
+            ]);
+            return { ...post.toObject(), likeCount, commentCount, likedByMe: !!likedByMe, favoritedByMe: !!favoritedByMe };
+        })
+    );
+}
+
 export async function getFeed(req: Request, res: Response) {
     try {
         const userId = req.user!.userId;
-        const following = await Follow.find({ followerId: userId }).select("followingId");
-        const followingIds = following.map((f) => f.followingId.toString());
-        const posts = await postService.getFeed(userId, followingIds);
+        const scope = req.query.scope === "following" ? "following" : "all";
 
-        const decorated = await Promise.all(
-            posts.map(async (post) => {
-                const [likeCount, commentCount, likedByMe] = await Promise.all([
-                    Like.countDocuments({ postId: post._id }),
-                    Comment.countDocuments({ postId: post._id }),
-                    Like.exists({ postId: post._id, userId }),
-                ]);
-                return { ...post.toObject(), likeCount, commentCount, likedByMe: !!likedByMe };
-            })
-        );
+        let posts;
+        if (scope === "following") {
+            const following = await Follow.find({ followerId: userId }).select("followingId");
+            const followingIds = following.map((f) => f.followingId.toString());
+            posts = await postService.getFollowingFeed(userId, followingIds);
 
+        } else {
+            posts = await postService.getFeed();
+        }
+
+        const decorated = await decoratePosts(posts, userId);
+        res.status(200).json(decorated);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function getUserPosts(req: Request<{ id: string }>, res: Response) {
+    try {
+        const posts = await postService.getPostsByAuthor(req.params.id);
+        const decorated = await decoratePosts(posts, req.user?.userId);
         res.status(200).json(decorated);
     } catch (error: any) {
         res.status(400).json({ message: error.message });

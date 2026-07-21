@@ -1,22 +1,45 @@
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../app/store";
 import { useGetFeedQuery } from "./postApiSlice";
 import { PostCard } from "./PostCard";
 import { Link } from "react-router-dom";
 import "../../styles/feed.css";
 
 export function FeedPage() {
-    const { data: posts, isLoading, error } = useGetFeedQuery();
+    const [scope, setScope] = useState<"all" | "following">("all");
+    const { data: posts, isLoading, error } = useGetFeedQuery(scope);
+    const currentUser = useSelector((state: RootState) => state.auth.user);
 
     return (
-        <div className="feed">
-            <div className="postForm">
-                <p>What's new?</p>
-                <Link to="/create">+</Link>
-            </div>
+        <div className="forYou">
+            <select
+                className="feedScopeSelect"
+                value={scope}
+                onChange={(e) => setScope(e.target.value as "all" | "following")}
+            >
+                <option value="all">For You</option>
+                <option value="following">Following</option>
+            </select>
 
-            <div className="postList">
-                {isLoading && <p>Loading feed...</p>}
-                {error && <p>Couldn't load the feed.</p>}
-                {posts?.map((post) => <PostCard key={post._id} post={post} />)}
+            <div className="feed">
+                <div className="postForm">
+                    <div className="postFormLeft">
+                        <img
+                            className="postFormPfp"
+                            src={currentUser?.avatarUrl || "/default-avatar.png"}
+                            alt={currentUser?.username}
+                        />
+                        <p>What's new?</p>
+                    </div>
+                    <Link to="/create">+</Link>
+                </div>
+
+                <div className="postList">
+                    {isLoading && <p>Loading feed...</p>}
+                    {error && <p>Couldn't load the feed.</p>}
+                    {posts?.map((post) => <PostCard key={post._id} post={post} />)}
+                </div>
             </div>
         </div>
     );

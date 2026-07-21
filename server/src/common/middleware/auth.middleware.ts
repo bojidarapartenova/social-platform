@@ -31,3 +31,15 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
         res.status(401).json({ message: "Invalid or expired token" });
     }
 }
+
+export function optionalAuth(req: Request, res: Response, next: NextFunction) {
+    const header = req.headers.authorization;
+    if (header?.startsWith("Bearer ")) {
+        const token = header.split(" ")[1];
+        try {
+            req.user = jwt.verify(token, env.JWT_SECRET) as AuthPayload;
+        } catch {
+        }
+    }
+    next();
+}

@@ -52,8 +52,8 @@
 .postFormCard textarea:focus,
 .postFormCard input:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, .15);
+    border-color: var(--color-text);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, .08);
 }
 
 .mediaRow {
@@ -82,19 +82,36 @@
     background: #f3f4f6;
 }
 
+.mediaRow .filterBtnSmall {
+    background: var(--color-text);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0 14px;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity .15s;
+}
+
+.mediaRow .filterBtnSmall:hover {
+    opacity: .85;
+}
+
 .addBtn {
     align-self: flex-start;
     margin-bottom: 1rem;
     background: none;
     border: none;
-    color: #2563eb;
+    color: var(--color-text);
     font-weight: 600;
     cursor: pointer;
 }
 
 .filterNote {
     font-size: .85rem;
-    color: #2563eb;
+    color: var(--color-text);
     margin-bottom: 1rem;
 }
 
@@ -103,7 +120,7 @@
     height: 50px;
     border: none;
     border-radius: 10px;
-    background: #2563eb;
+    background: var(--color-text);
     color: white;
     font-size: 1rem;
     font-weight: 600;
@@ -112,7 +129,7 @@
 }
 
 .postFormCard>button[type="submit"]:hover:not(:disabled) {
-    background: #1d4ed8;
+    opacity: .85;
 }
 
 .postFormCard>button[type="submit"]:disabled {

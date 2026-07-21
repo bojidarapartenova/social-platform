@@ -5,6 +5,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import { FeedPage } from "./features/posts/FeedPage";
 import { CreatePostForm } from "./features/posts/CreatePostForm";
 import { FilterPreviewPage } from "./features/posts/FilterPreviewPage";
+import { ProfilePage } from "./features/users/ProfilePage";
 
 function App() {
   return (
@@ -14,9 +15,10 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<FeedPage />} />
+          <Route path="/create" element={<CreatePostForm />} />
+          <Route path="/create/filters" element={<FilterPreviewPage />} />
+          <Route path="/profile/:id" element={<ProfilePage />} />
         </Route>
-        <Route path="/create" element={<CreatePostForm />} />
-        <Route path="/create/filters" element={<FilterPreviewPage />} />
       </Routes>
     </BrowserRouter>
   );

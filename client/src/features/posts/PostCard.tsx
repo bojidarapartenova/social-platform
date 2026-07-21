@@ -4,10 +4,34 @@ import type { RootState } from "../../app/store";
 import { FilteredImage } from "../feed/FilteredImage";
 import {
     useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation,
-    useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation
+    useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation, useDeleteCommentMutation
 } from "./postApiSlice";
 import type { Post } from "./postApiSlice";
 import { Link } from "react-router-dom";
+
+function HeartIcon({ filled }: { filled: boolean }) {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z" />
+        </svg>
+    );
+}
+
+function CommentIcon() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+        </svg>
+    );
+}
+
+function BookmarkIcon({ filled }: { filled: boolean }) {
+    return (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+        </svg>
+    );
+}
 
 export function PostCard({ post }: { post: Post }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
@@ -26,6 +50,7 @@ export function PostCard({ post }: { post: Post }) {
     const [commentText, setCommentText] = useState("");
     const [addComment] = useAddCommentMutation();
     const [toggleFavorite] = useToggleFavoriteMutation();
+    const [deleteComment] = useDeleteCommentMutation();
 
     async function handleSaveEdit() {
         await updatePost({ id: post._id, data: { caption: editCaption } });
@@ -88,23 +113,17 @@ export function PostCard({ post }: { post: Post }) {
             )}
 
             <div className="postActions">
-                <button
-                    type="button"
-                    className={post.likedByMe ? "actionBtn liked" : "actionBtn"}
-                    onClick={() => toggleLike(post._id)}
-                >
-                    {post.likedByMe ? "♥" : "♡"} {post.likeCount}
-                </button>
-                <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)}>
-                    💬 {post.commentCount}
-                </button>
-                <button
-                    type="button"
-                    className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"}
-                    onClick={() => toggleFavorite(post._id)}
-                >
-                    {post.favoritedByMe ? "★" : "☆"}
-                </button>
+                <div className="postActions">
+                    <button type="button" className={post.likedByMe ? "actionBtn liked" : "actionBtn"} onClick={() => toggleLike(post._id)}>
+                        <HeartIcon filled={post.likedByMe} /> {post.likeCount}
+                    </button>
+                    <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)}>
+                        <CommentIcon /> {post.commentCount}
+                    </button>
+                    <button type="button" className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"} onClick={() => toggleFavorite(post._id)}>
+                        <BookmarkIcon filled={post.favoritedByMe} />
+                    </button>
+                </div>
             </div>
 
             {showComments && (
@@ -112,6 +131,9 @@ export function PostCard({ post }: { post: Post }) {
                     {comments?.map((c) => (
                         <div key={c._id} className="comment">
                             <span className="commentAuthor">{c.authorId.username}</span> {c.text}
+                            {c.authorId._id === currentUserId && (
+                                <button type="button" className="deleteCommentBtn" onClick={() => deleteComment({ id: c._id, postId: post._id })}>✕</button>
+                            )}
                         </div>
                     ))}
                     <form className="commentForm" onSubmit={handleAddComment}>

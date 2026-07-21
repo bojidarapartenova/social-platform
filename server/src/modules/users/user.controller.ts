@@ -5,7 +5,7 @@ const userService = new UserService();
 
 export async function getUser(req: Request<{ id: string }>, res: Response) {
     try {
-        const user = await userService.getUserById(req.params.id);
+        const user = await userService.getUserById(req.params.id, req.user?.userId); // must pass req.user?.userId
         res.status(200).json(user);
     } catch (error: any) {
         res.status(404).json({ message: error.message });
