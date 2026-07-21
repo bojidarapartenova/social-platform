@@ -5,6 +5,7 @@ import { logout } from "../features/auth/authSlice";
 import { act, useState } from "react";
 import "../styles/navigation.css"
 
+import logo from '../images/logo.png'
 import homeIcon from '../images/home.png'
 import newIcon from '../images/plus.png'
 import searchIcon from '../images/search.png'
@@ -25,11 +26,12 @@ export function Navbar() {
 
     return (
         <aside className="sidebar">
-            <div className="appLogo">
-
-            </div>
 
             <nav className="sidebarNav">
+                <Link to="/" className="appLogo">
+                    <img src={logo} alt="Logo" className="navIcon" />
+                </Link>
+
                 <Link to="/" className="navItem">
                     <img src={homeIcon} alt="Home" className="navIcon" />
                     <span>Home</span>
