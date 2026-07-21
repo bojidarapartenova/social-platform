@@ -8,13 +8,22 @@ export default function RegisterPage() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState("");
+
     const [register, { isLoading, error }] = useRegisterMutation();
     const navigate = useNavigate();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         try {
-            await register({ name, username, email, password }).unwrap();
+            await register({
+                name,
+                username,
+                email,
+                password,
+                avatarUrl: avatarUrl.trim() || undefined,
+            }).unwrap();
+
             navigate("/login");
         } catch (err: any) {
             console.error("Register error:", err);
@@ -47,6 +56,15 @@ export default function RegisterPage() {
 
                     <label htmlFor="password">Password</label>
                     <input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a password" />
+
+                    <label htmlFor="avatarUrl">Profile Picture URL</label>
+                    <input
+                        id="avatarUrl"
+                        type="url"
+                        value={avatarUrl}
+                        onChange={(e) => setAvatarUrl(e.target.value)}
+                        placeholder="https://example.com/pfp.png (optional)"
+                    />
 
                     <button type="submit" disabled={isLoading}>GET STARTED</button>
 

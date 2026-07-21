@@ -12,6 +12,12 @@ export interface UserProfile {
     relationshipStatus: "self" | "friend" | "following" | "none";
 }
 
+export interface UpdateProfileRequest {
+    name?: string;
+    bio?: string;
+    avatarUrl?: string;
+}
+
 export const userApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getUser: builder.query<UserProfile, string>({
@@ -22,7 +28,20 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: (id) => `/users/${id}/posts`,
             providesTags: ["Post"],
         }),
+        updateProfile: builder.mutation<UserProfile, UpdateProfileRequest>({
+            query: (body) => ({
+                url: "/users/me",
+                method: "PATCH",
+                body,
+            }),
+            invalidatesTags: (result) =>
+                result ? [{ type: "User", id: result._id }] : [],
+        }),
     }),
 });
 
-export const { useGetUserQuery, useGetUserPostsQuery } = userApiSlice;
+export const {
+    useGetUserQuery,
+    useGetUserPostsQuery,
+    useUpdateProfileMutation,
+} = userApiSlice;

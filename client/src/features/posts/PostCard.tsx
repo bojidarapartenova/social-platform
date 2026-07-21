@@ -57,7 +57,6 @@ export function PostCard({ post }: { post: Post }) {
     const [toggleFavorite] = useToggleFavoriteMutation();
     const [deleteComment] = useDeleteCommentMutation();
 
-    // 1. Populate draft & navigate to /create
     function handleEdit() {
         dispatch(loadPostForEdit({
             _id: post._id,

@@ -5,11 +5,12 @@ interface LoginInput {
     password: string;
 }
 
-interface RegisterInput {
-    name?: string
+export interface RegisterInput {
+    name?: string;
     username: string;
     email: string;
     password: string;
+    avatarUrl?: string;
 }
 
 interface AuthResponse {

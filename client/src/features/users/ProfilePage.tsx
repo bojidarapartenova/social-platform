@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useGetUserQuery, useGetUserPostsQuery } from "./userApiSlice";
 import { useFollowUserMutation, useUnfollowUserMutation } from "../follows/followApiSlice";
 import { PostCard } from "../posts/PostCard";
@@ -10,14 +10,19 @@ export function ProfilePage() {
     const { data: posts, isLoading: postsLoading } = useGetUserPostsQuery(id!);
     const [followUser] = useFollowUserMutation();
     const [unfollowUser] = useUnfollowUserMutation();
+    const navigate = useNavigate();
 
     if (userLoading) return <p>Loading profile...</p>;
     if (!user) return <p>User not found.</p>;
 
+    function handleEdit() {
+        navigate("/profile/edit");
+    }
+
     function renderActionButton() {
         switch (user!.relationshipStatus) {
             case "self":
-                return <button className="profileBtn">Edit profile</button>;
+                return <button type="button" onClick={handleEdit} className="profileBtn">Edit profile</button>;
             case "friend":
                 return (
                     <div className="btnRow">

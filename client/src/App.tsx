@@ -6,6 +6,7 @@ import { FeedPage } from "./features/posts/FeedPage";
 import { CreatePostForm } from "./features/posts/CreatePostForm";
 import { FilterPreviewPage } from "./features/posts/FilterPreviewPage";
 import { ProfilePage } from "./features/users/ProfilePage";
+import { EditProfilePage } from "./features/users/EditProfilePage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<FeedPage />} />
           <Route path="/create" element={<CreatePostForm />} />
           <Route path="/create/filters" element={<FilterPreviewPage />} />
+          <Route path="/profile/edit" element={<EditProfilePage />} />
           <Route path="/profile/:id" element={<ProfilePage />} />
         </Route>
       </Routes>
