@@ -25,11 +25,14 @@ export function FeedPage() {
             <div className="feed">
                 <div className="postForm">
                     <div className="postFormLeft">
-                        <img
-                            className="postFormPfp"
-                            src={currentUser?.avatarUrl || "/default-avatar.png"}
-                            alt={currentUser?.username}
-                        />
+                        <Link to={`/profile/${currentUser?._id}`}>
+                            <img
+                                className="postFormPfp"
+                                src={currentUser?.avatarUrl || "/default-avatar.png"}
+                                alt={currentUser?.username}
+                            />
+                        </Link>
+
                         <p>What's new?</p>
                     </div>
                     <Link to="/create">+</Link>
