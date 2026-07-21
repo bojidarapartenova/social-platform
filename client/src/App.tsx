@@ -8,6 +8,7 @@ import { CreatePostForm } from "./features/posts/CreatePostForm";
 import { FilterPreviewPage } from "./features/posts/FilterPreviewPage";
 import { ProfilePage } from "./features/users/ProfilePage";
 import { EditProfilePage } from "./features/users/EditProfilePage";
+import { FavoritesPage } from "./features/posts/FavoritesPage";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
             <Route path="/create/filters" element={<FilterPreviewPage />} />
             <Route path="/profile/edit" element={<EditProfilePage />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
           </Route>
         </Route>
       </Routes>

@@ -12,4 +12,8 @@ export class BookmarkService {
         }
         return { favorited: !existing };
     }
+
+    async getFavorites(userId: string) {
+        return await this.bookmarkRepo.findUserFavorites(userId);
+    }
 }

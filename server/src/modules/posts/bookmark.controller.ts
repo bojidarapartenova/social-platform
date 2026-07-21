@@ -12,3 +12,13 @@ export async function toggleFavorite(req: Request<{ postId: string }>, res: Resp
         res.status(400).json({ message: error.message });
     }
 }
+
+export async function getFavorites(req: Request, res: Response) {
+    try {
+        const favorites = await bookmarkService.getFavorites(req.user!.userId);
+        res.status(200).json(favorites);
+    }
+    catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+}

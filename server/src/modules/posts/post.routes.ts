@@ -5,11 +5,12 @@ import { addComment, getComments } from "./comment.controller";
 import { requireAuth } from "../../common/middleware/auth.middleware";
 import { validate } from "../../common/middleware/validate.middleware";
 import { createPostSchema } from "./post.validation";
-import { toggleFavorite } from "./bookmark.controller";
+import { toggleFavorite, getFavorites } from "./bookmark.controller";
 
 const router = Router();
 
 router.get("/feed", requireAuth, getFeed);
+router.get("/favorites", requireAuth, getFavorites);
 router.post("/", requireAuth, validate(createPostSchema), createPost);
 router.get("/:id", getPost);
 router.put("/:id", requireAuth, updatePost);

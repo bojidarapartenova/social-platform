@@ -24,7 +24,7 @@ export interface Post {
     likeCount: number;
     commentCount: number;
     likedByMe: boolean;
-    favoritedByMe: boolean
+    favoritedByMe: boolean;
 }
 
 interface CreatePostInput {
@@ -37,6 +37,10 @@ export const postApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getFeed: builder.query<Post[], "all" | "following" | void>({
             query: (scope) => `/posts/feed?scope=${scope ?? "all"}`,
+            providesTags: ["Post"],
+        }),
+        getFavoritePosts: builder.query<Post[], void>({
+            query: () => "/posts/favorites",
             providesTags: ["Post"],
         }),
         createPost: builder.mutation<Post, CreatePostInput>({
@@ -67,8 +71,17 @@ export const postApiSlice = apiSlice.injectEndpoints({
             query: (postId) => ({ url: `/posts/${postId}/likes`, method: "POST" }),
             invalidatesTags: ["Post"],
             async onQueryStarted(postId, { dispatch, queryFulfilled }) {
-                const patch = dispatch(
+                const patchFeed = dispatch(
                     postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
+                        const post = draft.find((p) => p._id === postId);
+                        if (post) {
+                            post.likedByMe = !post.likedByMe;
+                            post.likeCount += post.likedByMe ? 1 : -1;
+                        }
+                    })
+                );
+                const patchFavs = dispatch(
+                    postApiSlice.util.updateQueryData("getFavoritePosts", undefined, (draft) => {
                         const post = draft.find((p) => p._id === postId);
                         if (post) {
                             post.likedByMe = !post.likedByMe;
@@ -79,28 +92,47 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 try {
                     await queryFulfilled;
                 } catch {
-                    patch.undo();
+                    patchFeed.undo();
+                    patchFavs.undo();
                 }
             },
         }),
-
         toggleFavorite: builder.mutation<{ favorited: boolean }, string>({
             query: (postId) => ({ url: `/posts/${postId}/favorites`, method: "POST" }),
             invalidatesTags: ["Post"],
             async onQueryStarted(postId, { dispatch, queryFulfilled }) {
-                const patch = dispatch(
+                const patchFeed = dispatch(
                     postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
                         const post = draft.find((p) => p._id === postId);
                         if (post) post.favoritedByMe = !post.favoritedByMe;
                     })
                 );
-                try { await queryFulfilled; } catch { patch.undo(); }
+                const patchFavs = dispatch(
+                    postApiSlice.util.updateQueryData("getFavoritePosts", undefined, (draft) => {
+                        const post = draft.find((p) => p._id === postId);
+                        if (post) post.favoritedByMe = !post.favoritedByMe;
+                    })
+                );
+                try {
+                    await queryFulfilled;
+                } catch {
+                    patchFeed.undo();
+                    patchFavs.undo();
+                }
             },
-        })
+        }),
     }),
 });
 
 export const {
-    useGetFeedQuery, useCreatePostMutation, useUpdatePostMutation, useDeletePostMutation,
-    useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation, useToggleFavoriteMutation, useDeleteCommentMutation
+    useGetFeedQuery,
+    useGetFavoritePostsQuery,
+    useCreatePostMutation,
+    useUpdatePostMutation,
+    useDeletePostMutation,
+    useToggleLikeMutation,
+    useGetCommentsQuery,
+    useAddCommentMutation,
+    useToggleFavoriteMutation,
+    useDeleteCommentMutation,
 } = postApiSlice;

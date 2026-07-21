@@ -59,13 +59,6 @@ export function ProfilePage() {
 
             <div className="profileDivider" />
 
-            {user.relationshipStatus === "self" && (
-                <div className="postForm">
-                    <p>What's new?</p>
-                    <Link to="/create">+</Link>
-                </div>
-            )}
-
             <p className="postsLabel">Posts</p>
 
             <div className="profilePosts">

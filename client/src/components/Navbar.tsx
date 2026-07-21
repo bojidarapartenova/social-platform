@@ -64,7 +64,7 @@ export function Navbar() {
                     </Link>
                 )}
 
-                <Link to="" className="navItem">
+                <Link to="/favorites" className="navItem">
                     <img src={savedIcon} alt="Saved" className="navIcon" />
                     <span>Saved</span>
                 </Link>
