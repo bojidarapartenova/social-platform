@@ -8,16 +8,18 @@ export interface MediaItem {
     filter: FilterName;
 }
 
-interface PostDraftState {
+export interface PostDraftState {
     caption: string;
     media: MediaItem[];
     editingIndex: number | null;
+    editingPostId: string | null;
 }
 
 const initialState: PostDraftState = {
     caption: "",
     media: [],
     editingIndex: null,
+    editingPostId: null,
 };
 
 const postDraftSlice = createSlice({
@@ -42,6 +44,19 @@ const postDraftSlice = createSlice({
         setEditingIndex(state, action: PayloadAction<number | null>) {
             state.editingIndex = action.payload;
         },
+        loadPostForEdit(
+            state,
+            action: PayloadAction<{
+                _id: string;
+                caption: string;
+                media?: MediaItem[];
+            }>
+        ) {
+            state.editingPostId = action.payload._id;
+            state.caption = action.payload.caption || "";
+            state.media = action.payload.media ? action.payload.media.map(m => ({ ...m })) : [];
+            state.editingIndex = null;
+        },
         resetDraft() {
             return initialState;
         },
@@ -49,8 +64,14 @@ const postDraftSlice = createSlice({
 });
 
 export const {
-    setCaption, setMediaUrlAt, setMediaFilterAt,
-    addMediaField, removeMediaAt, setEditingIndex, resetDraft,
+    setCaption,
+    setMediaUrlAt,
+    setMediaFilterAt,
+    addMediaField,
+    removeMediaAt,
+    setEditingIndex,
+    loadPostForEdit,
+    resetDraft,
 } = postDraftSlice.actions;
 
 export default postDraftSlice.reducer;

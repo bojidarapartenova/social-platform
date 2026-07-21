@@ -1,13 +1,18 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
 import type { RootState } from "../../app/store";
 import { FilteredImage } from "../feed/FilteredImage";
 import {
-    useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation,
-    useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation, useDeleteCommentMutation
+    useToggleLikeMutation,
+    useGetCommentsQuery,
+    useAddCommentMutation,
+    useDeletePostMutation,
+    useToggleFavoriteMutation,
+    useDeleteCommentMutation,
 } from "./postApiSlice";
 import type { Post } from "./postApiSlice";
-import { Link } from "react-router-dom";
+import { loadPostForEdit } from "./postDraftSlice";
 
 function HeartIcon({ filled }: { filled: boolean }) {
     return (
@@ -37,13 +42,13 @@ export function PostCard({ post }: { post: Post }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
     const isOwner = currentUserId === post.authorId._id;
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [toggleLike] = useToggleLikeMutation();
     const [showComments, setShowComments] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editCaption, setEditCaption] = useState(post.caption);
 
-    const [updatePost] = useUpdatePostMutation();
     const [deletePost] = useDeletePostMutation();
 
     const { data: comments } = useGetCommentsQuery(post._id, { skip: !showComments });
@@ -52,10 +57,15 @@ export function PostCard({ post }: { post: Post }) {
     const [toggleFavorite] = useToggleFavoriteMutation();
     const [deleteComment] = useDeleteCommentMutation();
 
-    async function handleSaveEdit() {
-        await updatePost({ id: post._id, data: { caption: editCaption } });
-        setIsEditing(false);
+    // 1. Populate draft & navigate to /create
+    function handleEdit() {
+        dispatch(loadPostForEdit({
+            _id: post._id,
+            caption: post.caption,
+            media: post.media,
+        }));
         setShowMenu(false);
+        navigate("/create");
     }
 
     async function handleDelete() {
@@ -84,7 +94,7 @@ export function PostCard({ post }: { post: Post }) {
                         <button type="button" className="menuBtn" onClick={() => setShowMenu((v) => !v)}>...</button>
                         {showMenu && (
                             <div className="menuDropdown">
-                                <button type="button" onClick={() => { setIsEditing(true); setShowMenu(false); }}>Edit</button>
+                                <button type="button" onClick={handleEdit}>Edit</button>
                                 <button type="button" onClick={handleDelete}>Delete</button>
                             </div>
                         )}
@@ -92,19 +102,9 @@ export function PostCard({ post }: { post: Post }) {
                 )}
             </div>
 
-            {isEditing ? (
-                <div className="editBox">
-                    <textarea value={editCaption} onChange={(e) => setEditCaption(e.target.value)} />
-                    <div className="editActions">
-                        <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-                        <button type="button" onClick={handleSaveEdit}>Save</button>
-                    </div>
-                </div>
-            ) : (
-                <p className="postCaption">{post.caption}</p>
-            )}
+            <p className="postCaption">{post.caption}</p>
 
-            {post.type === "photo" && post.media?.length > 0 && (
+            {post.type === "photo" && post.media && post.media.length > 0 && (
                 <div className="mediaScroll">
                     {post.media.map((item, i) => (
                         <FilteredImage key={i} src={item.url} filter={item.filter} />
@@ -113,17 +113,15 @@ export function PostCard({ post }: { post: Post }) {
             )}
 
             <div className="postActions">
-                <div className="postActions">
-                    <button type="button" className={post.likedByMe ? "actionBtn liked" : "actionBtn"} onClick={() => toggleLike(post._id)}>
-                        <HeartIcon filled={post.likedByMe} /> {post.likeCount}
-                    </button>
-                    <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)}>
-                        <CommentIcon /> {post.commentCount}
-                    </button>
-                    <button type="button" className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"} onClick={() => toggleFavorite(post._id)}>
-                        <BookmarkIcon filled={post.favoritedByMe} />
-                    </button>
-                </div>
+                <button type="button" className={post.likedByMe ? "actionBtn liked" : "actionBtn"} onClick={() => toggleLike(post._id)}>
+                    <HeartIcon filled={post.likedByMe} /> {post.likeCount}
+                </button>
+                <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)}>
+                    <CommentIcon /> {post.commentCount}
+                </button>
+                <button type="button" className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"} onClick={() => toggleFavorite(post._id)}>
+                    <BookmarkIcon filled={post.favoritedByMe} />
+                </button>
             </div>
 
             {showComments && (
