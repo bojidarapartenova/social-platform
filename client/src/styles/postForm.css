@@ -76,10 +76,13 @@
     cursor: pointer;
     font-size: .85rem;
     white-space: nowrap;
+    margin-bottom: 0;
 }
 
 .mediaRow button:hover {
     background: #f3f4f6;
+    color: black;
+    transition: opacity .15s;
 }
 
 .mediaRow .filterBtnSmall {
@@ -97,6 +100,23 @@
 
 .mediaRow .filterBtnSmall:hover {
     opacity: .85;
+}
+
+.mediaRow .removeBtn {
+    color: black;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+
+    font-size: 1.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity .15s;
 }
 
 .addBtn {
@@ -141,4 +161,8 @@
     margin-top: 1rem;
     color: #dc2626;
     font-size: .9rem;
+}
+
+form button {
+    margin-top: 0;
 }

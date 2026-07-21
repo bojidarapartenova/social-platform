@@ -64,7 +64,7 @@ export function CreatePostForm() {
                         <button type="button" className="filterBtnSmall" onClick={() => openFilterPage(i)}>
                             {item.filter === "none" ? "Choose filter" : `Filter: ${item.filter}`}
                         </button>
-                        <button type="button" onClick={() => dispatch(removeMediaAt(i))}>Remove</button>
+                        <button type="button" className="removeBtn" onClick={() => dispatch(removeMediaAt(i))}>×</button>
                     </div>
                 ))}
 
