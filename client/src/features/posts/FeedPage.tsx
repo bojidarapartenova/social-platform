@@ -13,14 +13,7 @@ export function FeedPage() {
 
     return (
         <div className="forYou">
-            <select
-                className="feedScopeSelect"
-                value={scope}
-                onChange={(e) => setScope(e.target.value as "all" | "following")}
-            >
-                <option value="all">For You</option>
-                <option value="following">Following</option>
-            </select>
+            <p className="feedScopeSelect">For You</p>
 
             <div className="feed">
                 <div className="postForm">

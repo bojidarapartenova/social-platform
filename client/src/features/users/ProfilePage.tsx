@@ -39,31 +39,33 @@ export function ProfilePage() {
     }
 
     return (
-        <div className="profilePage">
-            <div className="profileTop">
-                <div className="profileNames">
-                    <h2>{user.name || user.username}</h2>
-                    <p className="username">@{user.username}</p>
+        <div className="forYou">
+            <p className="feedScopeSelect">{user.username}</p>
+
+            <div className="feed">
+                <div className="profileHeader">
+                    <div className="profileTop">
+                        <div className="profileNames">
+                            <h2>{user.name || user.username}</h2>
+                            <p className="username">@{user.username}</p>
+                        </div>
+                        <img className="profilePfp" src={user.avatarUrl || "/default-avatar.png"} alt={user.username} />
+                    </div>
+
+                    {user.bio && <p className="profileBio">{user.bio}</p>}
+
+                    <div className="profileStats">
+                        <span><strong>{user.followerCount}</strong> followers</span>
+                        <span><strong>{user.followingCount}</strong> following</span>
+                    </div>
+
+                    {renderActionButton()}
                 </div>
-                <img className="profilePfp" src={user.avatarUrl || "/default-avatar.png"} alt={user.username} />
-            </div>
 
-            {user.bio && <p className="profileBio">{user.bio}</p>}
-
-            <div className="profileStats">
-                <span><strong>{user.followerCount}</strong> followers</span>
-                <span><strong>{user.followingCount}</strong> following</span>
-            </div>
-
-            {renderActionButton()}
-
-            <div className="profileDivider" />
-
-            <p className="postsLabel">Posts</p>
-
-            <div className="profilePosts">
-                {postsLoading && <p>Loading posts...</p>}
-                {posts?.map((post) => <PostCard key={post._id} post={post} />)}
+                <div className="postList">
+                    {postsLoading && <p>Loading posts...</p>}
+                    {posts?.map((post) => <PostCard key={post._id} post={post} />)}
+                </div>
             </div>
         </div>
     );
