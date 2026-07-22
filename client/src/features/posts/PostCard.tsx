@@ -119,7 +119,7 @@ export function PostCard({ post }: { post: Post }) {
                     <CommentIcon /> {post.commentCount}
                 </button>
                 <button type="button" className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"} onClick={() => toggleFavorite(post._id)}>
-                    <BookmarkIcon filled={post.favoritedByMe} />
+                    <BookmarkIcon filled={post.favoritedByMe} /> {post.favoriteCount}
                 </button>
             </div>
 

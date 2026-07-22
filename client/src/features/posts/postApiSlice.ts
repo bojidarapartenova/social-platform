@@ -23,6 +23,7 @@ export interface Post {
     createdAt: string;
     likeCount: number;
     commentCount: number;
+    favoriteCount: number;
     likedByMe: boolean;
     favoritedByMe: boolean;
 }
@@ -101,24 +102,16 @@ export const postApiSlice = apiSlice.injectEndpoints({
             query: (postId) => ({ url: `/posts/${postId}/favorites`, method: "POST" }),
             invalidatesTags: ["Post"],
             async onQueryStarted(postId, { dispatch, queryFulfilled }) {
-                const patchFeed = dispatch(
-                    postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
+                const patch = dispatch(
+                    postApiSlice.util.updateQueryData("getFeed", "all", (draft) => {
                         const post = draft.find((p) => p._id === postId);
-                        if (post) post.favoritedByMe = !post.favoritedByMe;
+                        if (post) {
+                            post.favoritedByMe = !post.favoritedByMe;
+                            post.favoriteCount += post.favoritedByMe ? 1 : -1;
+                        }
                     })
                 );
-                const patchFavs = dispatch(
-                    postApiSlice.util.updateQueryData("getFavoritePosts", undefined, (draft) => {
-                        const post = draft.find((p) => p._id === postId);
-                        if (post) post.favoritedByMe = !post.favoritedByMe;
-                    })
-                );
-                try {
-                    await queryFulfilled;
-                } catch {
-                    patchFeed.undo();
-                    patchFavs.undo();
-                }
+                try { await queryFulfilled; } catch { patch.undo(); }
             },
         }),
     }),

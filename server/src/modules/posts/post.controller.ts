@@ -32,13 +32,14 @@ export async function getPost(req: Request<{ id: string }>, res: Response) {
 async function decoratePosts(posts: any[], userId?: string) {
     return Promise.all(
         posts.map(async (post) => {
-            const [likeCount, commentCount, likedByMe, favoritedByMe] = await Promise.all([
+            const [likeCount, commentCount, favoriteCount, likedByMe, favoritedByMe] = await Promise.all([
                 Like.countDocuments({ postId: post._id }),
                 Comment.countDocuments({ postId: post._id }),
+                Bookmark.countDocuments({ postId: post._id }),
                 userId ? Like.exists({ postId: post._id, userId }) : false,
                 userId ? Bookmark.exists({ postId: post._id, userId }) : false,
             ]);
-            return { ...post.toObject(), likeCount, commentCount, likedByMe: !!likedByMe, favoritedByMe: !!favoritedByMe };
+            return { ...post.toObject(), likeCount, commentCount, favoriteCount, likedByMe: !!likedByMe, favoritedByMe: !!favoritedByMe };
         })
     );
 }

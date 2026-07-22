@@ -1,0 +1,14 @@
+.appContainer {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.mainContent {
+    flex: 1;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}

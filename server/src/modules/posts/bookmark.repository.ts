@@ -30,17 +30,20 @@ export class BookmarkRepository {
         const favoritedPosts = await Promise.all(
             bookmarks
                 .filter((b) => b.postId !== null)
+                // bookmark.repository.ts — findUserFavorites, inside the .map():
                 .map(async (b) => {
                     const post = (b.postId as any).toObject();
                     const postIdStr = post._id.toString();
 
                     const likeCount = await Like.countDocuments({ postId: post._id });
                     const commentCount = await Comment.countDocuments({ postId: post._id });
+                    const favoriteCount = await Bookmark.countDocuments({ postId: post._id });
 
                     return {
                         ...post,
                         likeCount: post.likeCount ?? likeCount,
                         commentCount: post.commentCount ?? commentCount,
+                        favoriteCount,
                         favoritedByMe: true,
                         likedByMe: likedPostIds.has(postIdStr),
                     };
