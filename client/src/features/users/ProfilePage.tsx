@@ -27,7 +27,7 @@ export function ProfilePage() {
                 return (
                     <div className="btnRow">
                         <button className="profileBtn" onClick={() => unfollowUser(user!._id)}>Unfollow</button>
-                        <Link to={`/chat/${user!._id}`} className="profileBtn primary">Message</Link>
+                        <Link to={`/messages/${user!._id}`} className="profileBtn primary">Message</Link>
                     </div>
                 );
             case "following":

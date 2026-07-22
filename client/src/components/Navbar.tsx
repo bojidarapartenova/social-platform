@@ -49,7 +49,7 @@ export function Navbar() {
 
                 <br />
 
-                <Link to="" className="navItem">
+                <Link to="/messages" className="navItem">
                     <img src={messageIcon} alt="Messages" className="navIcon" />
                     <span>Messages</span>
                 </Link>

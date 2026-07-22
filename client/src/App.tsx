@@ -9,6 +9,8 @@ import { FilterPreviewPage } from "./features/posts/FilterPreviewPage";
 import { ProfilePage } from "./features/users/ProfilePage";
 import { EditProfilePage } from "./features/users/EditProfilePage";
 import { FavoritesPage } from "./features/posts/FavoritesPage";
+import { MessagesLayout } from "./features/chats/MessagesLayout";
+import { ChatWindow } from "./features/chats/ChatWindow";
 
 function App() {
   return (
@@ -24,6 +26,20 @@ function App() {
             <Route path="/profile/edit" element={<EditProfilePage />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+
+            <Route path="/messages" element={<MessagesLayout />}>
+              <Route
+                index
+                element={
+                  <div className="chatEmpty">
+                    <h3>Your Messages</h3>
+                    <p>Select a friend from the left to start chatting.</p>
+                  </div>
+                }
+              />
+              <Route path=":userId" element={<ChatWindow />} />
+            </Route>
+
           </Route>
         </Route>
       </Routes>
