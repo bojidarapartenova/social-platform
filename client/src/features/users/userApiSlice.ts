@@ -13,6 +13,7 @@ export interface UserProfile {
 }
 
 export interface UpdateProfileRequest {
+    id: string;
     name?: string;
     bio?: string;
     avatarUrl?: string;
@@ -29,13 +30,12 @@ export const userApiSlice = apiSlice.injectEndpoints({
             providesTags: ["Post"],
         }),
         updateProfile: builder.mutation<UserProfile, UpdateProfileRequest>({
-            query: (body) => ({
-                url: "/users/me",
-                method: "PATCH",
+            query: ({ id, ...body }) => ({
+                url: `/users/${id}`,
+                method: "PUT",
                 body,
             }),
-            invalidatesTags: (result) =>
-                result ? [{ type: "User", id: result._id }] : [],
+            invalidatesTags: (result) => (result ? [{ type: "User", id: result._id }] : []),
         }),
     }),
 });

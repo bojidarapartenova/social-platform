@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useGetUserQuery, useUpdateProfileMutation } from "./userApiSlice";
+import { useDispatch } from "react-redux";
+import { updateUserInfo } from "../auth/authSlice";
 
 export function EditProfilePage() {
     const navigate = useNavigate();
@@ -19,6 +21,8 @@ export function EditProfilePage() {
     const [formError, setFormError] = useState("");
     const [isCancelHovered, setIsCancelHovered] = useState(false);
 
+    const dispatch = useDispatch();
+
     useEffect(() => {
         if (user) {
             setName(user.name || "");
@@ -34,11 +38,18 @@ export function EditProfilePage() {
         setFormError("");
 
         try {
-            await updateProfile({
+            const updated = await updateProfile({
+                id: currentUserId!,
                 name: name.trim(),
                 bio: bio.trim(),
                 avatarUrl: avatarUrl.trim(),
             }).unwrap();
+
+            dispatch(updateUserInfo({
+                name: updated.name,
+                bio: updated.bio,
+                avatarUrl: updated.avatarUrl,
+            }));
 
             navigate(`/profile/${currentUserId}`);
         } catch {
@@ -78,7 +89,6 @@ export function EditProfilePage() {
                     placeholder="Tell us about yourself..."
                 />
 
-                {/* Side-by-Side Action Buttons */}
                 <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
                     <button type="submit" disabled={isUpdating} style={{ flex: 1 }}>
                         {isUpdating ? "Saving..." : "Save changes"}
