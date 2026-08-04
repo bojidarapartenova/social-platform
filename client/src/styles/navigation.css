@@ -75,6 +75,16 @@
     gap: 10px;
 }
 
-.appLogo img {
+#appLogo img {
     width: 200px;
+}
+
+.navItem.active {
+    background-color: var(--color-hover);
+    border: none;
+}
+
+.navItemDisabled {
+    opacity: 0.4;
+    cursor: default;
 }

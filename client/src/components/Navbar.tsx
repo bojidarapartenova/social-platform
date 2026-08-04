@@ -1,8 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../app/store";
 import { logout } from "../features/auth/authSlice";
-import { act, useState } from "react";
 import "../styles/navigation.css"
 
 import logo from '../images/logo.png'
@@ -26,56 +25,54 @@ export function Navbar() {
 
     return (
         <aside className="sidebar">
-
             <nav className="sidebarNav">
-                <Link to="/" className="appLogo" aria-label="Home">
+                <NavLink to="/" end id="appLogo" className={({ isActive }) => isActive ? " " : ""}>
                     <img src={logo} alt="Logo" className="navIcon" />
-                </Link>
+                </NavLink>
 
-                <Link to="/" className="navItem">
+                <NavLink to="/" end className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={homeIcon} alt="Home" className="navIcon" />
                     <span>Home</span>
-                </Link>
+                </NavLink>
 
-                <Link to="/create" className="navItem">
+                <NavLink to="/create" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={newIcon} alt="New Post" className="navIcon" />
                     <span>New Post</span>
-                </Link>
+                </NavLink>
 
-                <Link to="" className="navItem">
+                <NavLink to="/search" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={searchIcon} alt="Search" className="navIcon" />
                     <span>Search</span>
-                </Link>
+                </NavLink>
 
                 <br />
 
-                <Link to="/messages" className="navItem">
+                <NavLink to="/messages" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={messageIcon} alt="Messages" className="navIcon" />
                     <span>Messages</span>
-                </Link>
+                </NavLink>
 
-                <Link to="" className="navItem">
+                <NavLink to="/activity" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={activityIcon} alt="Activity" className="navIcon" />
                     <span>Activity</span>
-                </Link>
+                </NavLink>
 
                 {currentUser && (
-                    <Link to={`/profile/${currentUser._id}`} className="navItem">
+                    <NavLink to={`/profile/${currentUser._id}`} className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                         <img src={profileIcon} alt="Profile" className="navIcon" />
                         <span>Profile</span>
-                    </Link>
+                    </NavLink>
                 )}
 
-                <Link to="/favorites" className="navItem">
+                <NavLink to="/favorites" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={savedIcon} alt="Saved" className="navIcon" />
                     <span>Saved</span>
-                </Link>
+                </NavLink>
 
                 <br />
-                <Link to="" className="navItem">
+                <NavLink to="/groups" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <span>Groups</span>
-                </Link>
-
+                </NavLink>
             </nav>
 
             <div className="sidebarFooter">
