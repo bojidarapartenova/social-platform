@@ -6,6 +6,7 @@ import followRoutes from "./modules/follows/follow.routes"
 import postRoutes from "./modules/posts/post.routes";
 import commentRoutes from "./modules/posts/comment.routes";
 import chatRoutes from "./modules/chats/chat.routes"
+import groupRoutes from "./modules/groups/group.routes";
 
 const app = express();
 
@@ -24,5 +25,6 @@ app.use("/api/follows", followRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/chats", chatRoutes);
+app.use("/api/groups", groupRoutes);
 
 export default app;

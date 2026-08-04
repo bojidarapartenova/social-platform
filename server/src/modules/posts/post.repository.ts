@@ -25,6 +25,7 @@ export class PostRepository implements IRepository<IPost> {
             .sort({ createdAt: -1 })
             .limit(limit)
             .populate("authorId", "username avatarUrl name")
+            .populate("groupId", "name avatarUrl ownerId")
             .exec();
     }
 }

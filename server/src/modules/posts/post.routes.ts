@@ -6,12 +6,17 @@ import { requireAuth } from "../../common/middleware/auth.middleware";
 import { validate } from "../../common/middleware/validate.middleware";
 import { createPostSchema } from "./post.validation";
 import { toggleFavorite, getFavorites } from "./bookmark.controller";
+import { getGroupPosts } from "./post.controller";
+import { getPostsByTag } from "./post.controller";
+import { optionalAuth } from "../../common/middleware/auth.middleware";
 
 const router = Router();
 
 router.get("/feed", requireAuth, getFeed);
 router.get("/favorites", requireAuth, getFavorites);
 router.post("/", requireAuth, validate(createPostSchema), createPost);
+router.get("/group/:groupId", requireAuth, getGroupPosts);
+router.get("/tag/:tag", optionalAuth, getPostsByTag);
 router.get("/:id", getPost);
 router.put("/:id", requireAuth, updatePost);
 router.delete("/:id", requireAuth, deletePost);

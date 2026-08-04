@@ -4,6 +4,8 @@ import { Like } from "./like.model";
 import { Comment } from "./comment.model";
 import { Bookmark } from "./bookmark.model";
 import { Follow } from "../follows/follow.model";
+import { Group } from "../groups/group.model";
+import { GroupMembership } from "../groups/groupMembership.model";
 
 const postService = new PostService();
 
@@ -47,19 +49,36 @@ async function decoratePosts(posts: any[], userId?: string) {
 export async function getFeed(req: Request, res: Response) {
     try {
         const userId = req.user!.userId;
-        const scope = req.query.scope === "following" ? "following" : "all";
 
-        let posts;
-        if (scope === "following") {
-            const following = await Follow.find({ followerId: userId }).select("followingId");
-            const followingIds = following.map((f) => f.followingId.toString());
-            posts = await postService.getFollowingFeed(userId, followingIds);
+        const [following, memberships] = await Promise.all([
+            Follow.find({ followerId: userId }).select("followingId"),
+            GroupMembership.find({ userId, status: "approved" }).select("groupId"),
+        ]);
+        const followingIds = following.map((f) => f.followingId.toString());
+        const groupIds = memberships.map((m) => m.groupId.toString());
 
-        } else {
-            posts = await postService.getFeed();
-        }
-
+        const posts = await postService.getFeed(userId, followingIds, groupIds);
         const decorated = await decoratePosts(posts, userId);
+        res.status(200).json(decorated);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function getGroupPosts(req: Request<{ groupId: string }>, res: Response) {
+    try {
+        const posts = await postService.getPostsByGroup(req.params.groupId);
+        const decorated = await decoratePosts(posts, req.user?.userId);
+        res.status(200).json(decorated);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function getPostsByTag(req: Request<{ tag: string }>, res: Response) {
+    try {
+        const posts = await postService.getPostsByTag(req.params.tag);
+        const decorated = await decoratePosts(posts, req.user?.userId);
         res.status(200).json(decorated);
     } catch (error: any) {
         res.status(400).json({ message: error.message });
