@@ -8,8 +8,10 @@ export function ProfilePage() {
     const { id } = useParams<{ id: string }>();
     const { data: user, isLoading: userLoading } = useGetUserQuery(id!);
     const { data: posts, isLoading: postsLoading } = useGetUserPostsQuery(id!);
-    const [followUser] = useFollowUserMutation();
-    const [unfollowUser] = useUnfollowUserMutation();
+
+    const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
+    const [unfollowUser, { isLoading: isUnfollowing }] = useUnfollowUserMutation();
+
     const navigate = useNavigate();
 
     if (userLoading) return <p>Loading profile...</p>;
@@ -26,15 +28,37 @@ export function ProfilePage() {
             case "friend":
                 return (
                     <div className="btnRow">
-                        <button className="profileBtn" onClick={() => unfollowUser(user!._id)}>Unfollow</button>
+                        <button
+                            className="profileBtn"
+                            onClick={() => unfollowUser(user!._id)}
+                            disabled={isUnfollowing}
+                        >
+                            Unfollow
+                        </button>
                         <Link to={`/messages/${user!._id}`} className="profileBtn primary">Message</Link>
                     </div>
                 );
             case "following":
-                return <button className="profileBtn" onClick={() => unfollowUser(user!._id)}>Unfollow</button>;
+                return (
+                    <button
+                        className="profileBtn"
+                        onClick={() => unfollowUser(user!._id)}
+                        disabled={isUnfollowing}
+                    >
+                        Unfollow
+                    </button>
+                );
             case "none":
             default:
-                return <button className="profileBtn primary" onClick={() => followUser(user!._id)}>Follow</button>;
+                return (
+                    <button
+                        className="profileBtn primary"
+                        onClick={() => followUser(user!._id)}
+                        disabled={isFollowing}
+                    >
+                        Follow
+                    </button>
+                );
         }
     }
 

@@ -11,6 +11,7 @@ import { EditProfilePage } from "./features/users/EditProfilePage";
 import { FavoritesPage } from "./features/posts/FavoritesPage";
 import { MessagesLayout } from "./features/chats/MessagesLayout";
 import { ChatWindow } from "./features/chats/ChatWindow";
+import { NotFoundPage } from "./routes/NotFoundPage";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
 
           </Route>
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

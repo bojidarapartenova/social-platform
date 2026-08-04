@@ -349,3 +349,12 @@
 .postAuthorLink :hover {
     text-decoration: underline;
 }
+
+.imageLoadError {
+    padding: 2rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    background: var(--color-hover);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+}

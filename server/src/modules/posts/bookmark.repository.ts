@@ -15,6 +15,10 @@ export class BookmarkRepository {
         return Bookmark.deleteOne(filter).exec();
     }
 
+    countByPost(postId: string) {
+        return Bookmark.countDocuments({ postId }).exec();
+    }
+
     async findUserFavorites(userId: string) {
         const bookmarks = await Bookmark.find({ userId })
             .populate({
@@ -30,7 +34,6 @@ export class BookmarkRepository {
         const favoritedPosts = await Promise.all(
             bookmarks
                 .filter((b) => b.postId !== null)
-                // bookmark.repository.ts — findUserFavorites, inside the .map():
                 .map(async (b) => {
                     const post = (b.postId as any).toObject();
                     const postIdStr = post._id.toString();

@@ -90,7 +90,9 @@ export function PostCard({ post }: { post: Post }) {
 
                 {isOwner && (
                     <div className="postMenu">
-                        <button type="button" className="menuBtn" onClick={() => setShowMenu((v) => !v)}>...</button>
+                        <button type="button" className="menuBtn" onClick={() => setShowMenu((v) => !v)} aria-label="Post options">
+                            ...
+                        </button>
                         {showMenu && (
                             <div className="menuDropdown">
                                 <button type="button" onClick={handleEdit}>Edit</button>
@@ -112,13 +114,28 @@ export function PostCard({ post }: { post: Post }) {
             )}
 
             <div className="postActions">
-                <button type="button" className={post.likedByMe ? "actionBtn liked" : "actionBtn"} onClick={() => toggleLike(post._id)}>
+                <button
+                    type="button"
+                    className={post.likedByMe ? "actionBtn liked" : "actionBtn"}
+                    onClick={() => toggleLike(post._id)}
+                    aria-label={post.likedByMe ? "Unlike post" : "Like post"}
+                >
                     <HeartIcon filled={post.likedByMe} /> {post.likeCount}
                 </button>
-                <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)}>
+                <button
+                    type="button"
+                    className="actionBtn"
+                    onClick={() => setShowComments((v) => !v)}
+                    aria-label="View comments"
+                >
                     <CommentIcon /> {post.commentCount}
                 </button>
-                <button type="button" className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"} onClick={() => toggleFavorite(post._id)}>
+                <button
+                    type="button"
+                    className={post.favoritedByMe ? "actionBtn favorited" : "actionBtn"}
+                    onClick={() => toggleFavorite(post._id)}
+                    aria-label={post.favoritedByMe ? "Remove from favorites" : "Add to favorites"}
+                >
                     <BookmarkIcon filled={post.favoritedByMe} /> {post.favoriteCount}
                 </button>
             </div>

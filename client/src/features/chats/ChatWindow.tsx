@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useStartConversationMutation, useGetMessagesQuery, useSendMessageMutation } from "./chatApiSlice";
-import { MessagesLayout } from "./MessagesLayout";
+import "../../styles/feed.css";
+import "../../styles/chat.css";
 
 export function ChatWindow() {
     const { userId } = useParams<{ userId: string }>();
@@ -12,6 +13,7 @@ export function ChatWindow() {
     const [conversationId, setConversationId] = useState<string | null>(null);
     const [text, setText] = useState("");
     const [error, setError] = useState("");
+    const bottomRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         let cancelled = false;
@@ -30,9 +32,13 @@ export function ChatWindow() {
 
     const { data: messages } = useGetMessagesQuery(conversationId!, {
         skip: !conversationId,
-        pollingInterval: 3000, // stand-in for real-time until Socket.IO gets added
+        pollingInterval: 3000,
     });
     const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
+
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
 
     async function handleSend(e: React.FormEvent) {
         e.preventDefault();
@@ -42,7 +48,11 @@ export function ChatWindow() {
     }
 
     if (error) {
-        return <div className="chatEmpty"><p>{error}</p></div>;
+        return (
+            <div className="chatEmpty">
+                <p>{error}</p>
+            </div>
+        );
     }
 
     return (
@@ -53,10 +63,16 @@ export function ChatWindow() {
                         {m.text}
                     </div>
                 ))}
+                <div ref={bottomRef} />
             </div>
 
             <form className="chatInputRow" onSubmit={handleSend}>
-                <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Message..." />
+                <input
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Message..."
+                    disabled={isSending}
+                />
                 <button type="submit" disabled={isSending || !text.trim()}>Send</button>
             </form>
         </>

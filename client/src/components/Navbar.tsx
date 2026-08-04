@@ -28,7 +28,7 @@ export function Navbar() {
         <aside className="sidebar">
 
             <nav className="sidebarNav">
-                <Link to="/" className="appLogo">
+                <Link to="/" className="appLogo" aria-label="Home">
                     <img src={logo} alt="Logo" className="navIcon" />
                 </Link>
 

@@ -4,15 +4,19 @@ export class LikeService {
     constructor(private likeRepo: LikeRepository = new LikeRepository()) { }
 
     async toggleLike(postId: string, userId: string) {
-        const existing = await this.likeRepo.findOne({ postId, userId } as any);
-
-        if (existing) {
-            await this.likeRepo.deleteOne({ postId, userId } as any);
-        } else {
-            await this.likeRepo.create({ postId, userId } as any);
+        try {
+            const existing = await this.likeRepo.findOne({ postId, userId } as any);
+            if (existing) {
+                await this.likeRepo.deleteOne({ postId, userId } as any);
+            } else {
+                await this.likeRepo.create({ postId, userId } as any);
+            }
+        } catch (err: any) {
+            if (err.code !== 11000) throw err;
         }
 
         const likeCount = await this.likeRepo.countByPost(postId);
-        return { liked: !existing, likeCount };
+        const stillLiked = await this.likeRepo.findOne({ postId, userId } as any);
+        return { liked: !!stillLiked, likeCount };
     }
 }

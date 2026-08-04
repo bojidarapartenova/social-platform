@@ -35,7 +35,7 @@ export const userApiSlice = apiSlice.injectEndpoints({
                 method: "PUT",
                 body,
             }),
-            invalidatesTags: (result) => (result ? [{ type: "User", id: result._id }] : []),
+            invalidatesTags: (result) => (result ? [{ type: "User", id: result._id }, "Post"] : []),
         }),
     }),
 });
