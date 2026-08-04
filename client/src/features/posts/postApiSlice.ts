@@ -13,13 +13,20 @@ export interface Comment {
     createdAt: string;
 }
 
+export interface PostGroup {
+    _id: string;
+    name: string;
+    avatarUrl?: string;
+    ownerId: string;
+}
+
 export interface Post {
     _id: string;
     authorId: { _id: string; username: string; name?: string; avatarUrl?: string };
     type: "photo" | "text";
     caption: string;
     media: MediaItem[];
-    groupId: string | null;
+    groupId: PostGroup | null;
     createdAt: string;
     likeCount: number;
     commentCount: number;
@@ -32,6 +39,7 @@ interface CreatePostInput {
     type: "photo" | "text";
     caption?: string;
     media?: MediaItem[];
+    groupId?: string;
 }
 
 export const postApiSlice = apiSlice.injectEndpoints({
@@ -114,6 +122,10 @@ export const postApiSlice = apiSlice.injectEndpoints({
                 try { await queryFulfilled; } catch { patch.undo(); }
             },
         }),
+        getPostsByTag: builder.query<Post[], string>({
+            query: (tag) => `/posts/tag/${tag}`,
+            providesTags: ["Post"],
+        }),
     }),
 });
 
@@ -128,4 +140,5 @@ export const {
     useAddCommentMutation,
     useToggleFavoriteMutation,
     useDeleteCommentMutation,
+    useGetPostsByTagQuery
 } = postApiSlice;

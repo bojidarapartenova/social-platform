@@ -12,6 +12,11 @@ import { FavoritesPage } from "./features/posts/FavoritesPage";
 import { MessagesLayout } from "./features/chats/MessagesLayout";
 import { ChatWindow } from "./features/chats/ChatWindow";
 import { NotFoundPage } from "./routes/NotFoundPage";
+import { GroupsListPage } from "./features/groups/GroupsListPage";
+import { CreateGroupForm } from "./features/groups/CreateGroupForm";
+import { GroupPage } from "./features/groups/GroupPage";
+import { TagPage } from "./features/posts/TagPage";
+
 
 function App() {
   return (
@@ -27,6 +32,10 @@ function App() {
             <Route path="/profile/edit" element={<EditProfilePage />} />
             <Route path="/profile/:id" element={<ProfilePage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/groups" element={<GroupsListPage />} />
+            <Route path="/groups/new" element={<CreateGroupForm />} />
+            <Route path="/groups/:id" element={<GroupPage />} />
+            <Route path="/tags/:tag" element={<TagPage />} />
 
             <Route path="/messages" element={<MessagesLayout />}>
               <Route

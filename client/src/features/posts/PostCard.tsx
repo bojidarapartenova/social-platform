@@ -1,18 +1,14 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
+import { Link } from "react-router-dom";
 import { FilteredImage } from "../feed/FilteredImage";
 import {
-    useToggleLikeMutation,
-    useGetCommentsQuery,
-    useAddCommentMutation,
-    useDeletePostMutation,
-    useToggleFavoriteMutation,
-    useDeleteCommentMutation,
+    useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation, useDeleteCommentMutation,
+    useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation,
 } from "./postApiSlice";
 import type { Post } from "./postApiSlice";
-import { loadPostForEdit } from "./postDraftSlice";
+import { HashtagText } from "../../components/HashtagText";
 
 function HeartIcon({ filled }: { filled: boolean }) {
     return (
@@ -38,33 +34,30 @@ function BookmarkIcon({ filled }: { filled: boolean }) {
     );
 }
 
-export function PostCard({ post }: { post: Post }) {
+export function PostCard({ post, isGroupOwner = false }: { post: Post; isGroupOwner?: boolean }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
     const isOwner = currentUserId === post.authorId._id;
-
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const canDelete = isOwner || isGroupOwner;
 
     const [toggleLike] = useToggleLikeMutation();
+    const [toggleFavorite] = useToggleFavoriteMutation();
     const [showComments, setShowComments] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editCaption, setEditCaption] = useState(post.caption);
 
+    const [updatePost] = useUpdatePostMutation();
     const [deletePost] = useDeletePostMutation();
 
     const { data: comments } = useGetCommentsQuery(post._id, { skip: !showComments });
     const [commentText, setCommentText] = useState("");
     const [addComment] = useAddCommentMutation();
-    const [toggleFavorite] = useToggleFavoriteMutation();
     const [deleteComment] = useDeleteCommentMutation();
 
-    function handleEdit() {
-        dispatch(loadPostForEdit({
-            _id: post._id,
-            caption: post.caption,
-            media: post.media,
-        }));
+    async function handleSaveEdit() {
+        await updatePost({ id: post._id, data: { caption: editCaption } });
+        setIsEditing(false);
         setShowMenu(false);
-        navigate("/create");
     }
 
     async function handleDelete() {
@@ -88,14 +81,20 @@ export function PostCard({ post }: { post: Post }) {
                     <span>{post.authorId.username}</span>
                 </Link>
 
-                {isOwner && (
+                {post.groupId && (
+                    <Link to={`/groups/${post.groupId._id}`} className="postGroupTag">
+                        in {post.groupId.name}
+                    </Link>
+                )}
+
+                {canDelete && (
                     <div className="postMenu">
                         <button type="button" className="menuBtn" onClick={() => setShowMenu((v) => !v)} aria-label="Post options">
                             ...
                         </button>
                         {showMenu && (
                             <div className="menuDropdown">
-                                <button type="button" onClick={handleEdit}>Edit</button>
+                                {isOwner && <button type="button" onClick={() => { setIsEditing(true); setShowMenu(false); }}>Edit</button>}
                                 <button type="button" onClick={handleDelete}>Delete</button>
                             </div>
                         )}
@@ -103,9 +102,19 @@ export function PostCard({ post }: { post: Post }) {
                 )}
             </div>
 
-            <p className="postCaption">{post.caption}</p>
+            {isEditing ? (
+                <div className="editBox">
+                    <textarea value={editCaption} onChange={(e) => setEditCaption(e.target.value)} />
+                    <div className="editActions">
+                        <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
+                        <button type="button" onClick={handleSaveEdit}>Save</button>
+                    </div>
+                </div>
+            ) : (
+                <p className="postCaption"><HashtagText text={post.caption} /></p>
+            )}
 
-            {post.type === "photo" && post.media && post.media.length > 0 && (
+            {post.type === "photo" && post.media?.length > 0 && (
                 <div className="mediaScroll">
                     {post.media.map((item, i) => (
                         <FilteredImage key={i} src={item.url} filter={item.filter} />
@@ -122,12 +131,7 @@ export function PostCard({ post }: { post: Post }) {
                 >
                     <HeartIcon filled={post.likedByMe} /> {post.likeCount}
                 </button>
-                <button
-                    type="button"
-                    className="actionBtn"
-                    onClick={() => setShowComments((v) => !v)}
-                    aria-label="View comments"
-                >
+                <button type="button" className="actionBtn" onClick={() => setShowComments((v) => !v)} aria-label="View comments">
                     <CommentIcon /> {post.commentCount}
                 </button>
                 <button

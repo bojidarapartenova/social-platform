@@ -18,4 +18,8 @@ export class BookmarkService {
         const stillFavorited = await this.bookmarkRepo.findOne({ postId, userId } as any);
         return { favorited: !!stillFavorited };
     }
+
+    async getFavorites(userId: string) {
+        return this.bookmarkRepo.findUserFavorites(userId);
+    }
 }

@@ -1,0 +1,144 @@
+.groupsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.groupsNewBtn {
+    width: auto;
+    padding: 8px 16px;
+    margin-top: 0;
+}
+
+.groupsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 1rem 0;
+}
+
+.groupCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    transition: background .15s;
+}
+
+.groupCard:hover {
+    background: var(--color-hover);
+}
+
+.groupCard img {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.groupCard span {
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.groupBadge {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 6px 14px;
+    background: var(--color-hover);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.groupBadge.banned {
+    color: var(--color-danger);
+}
+
+.groupRequests {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.groupRequestsTitle {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.6rem;
+}
+
+.groupRequestRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+}
+
+.groupRequestRow img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.groupRequestRow span {
+    flex: 1;
+    font-size: 0.88rem;
+}
+
+.groupRequestActions {
+    display: flex;
+    gap: 6px;
+}
+
+.groupRequestActions button {
+    border: 1px solid var(--color-border-strong);
+    background: white;
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.groupRequestActions button:hover {
+    background: var(--color-hover);
+}
+
+.groupRequestActions .banBtn {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.postGroupTag {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    margin-left: 6px;
+}
+
+.postGroupTag:hover {
+    text-decoration: underline;
+}
+
+.groupPostBanner {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.hashtag {
+    color: var(--color-link);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.hashtag:hover {
+    text-decoration: underline;
+}

@@ -13,6 +13,7 @@ export interface PostDraftState {
     media: MediaItem[];
     editingIndex: number | null;
     editingPostId: string | null;
+    groupId: string | null;
 }
 
 const initialState: PostDraftState = {
@@ -20,6 +21,7 @@ const initialState: PostDraftState = {
     media: [],
     editingIndex: null,
     editingPostId: null,
+    groupId: null,
 };
 
 const postDraftSlice = createSlice({
@@ -44,6 +46,9 @@ const postDraftSlice = createSlice({
         setEditingIndex(state, action: PayloadAction<number | null>) {
             state.editingIndex = action.payload;
         },
+        setGroupId(state, action: PayloadAction<string | null>) {
+            state.groupId = action.payload;
+        },
         loadPostForEdit(
             state,
             action: PayloadAction<{
@@ -67,6 +72,7 @@ export const {
     setCaption,
     setMediaUrlAt,
     setMediaFilterAt,
+    setGroupId,
     addMediaField,
     removeMediaAt,
     setEditingIndex,

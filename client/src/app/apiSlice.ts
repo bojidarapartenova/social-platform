@@ -23,6 +23,6 @@ const baseQueryWithAuth = async (args: any, api: any, extraOptions: any) => {
 export const apiSlice = createApi({
     reducerPath: "api",
     baseQuery: baseQueryWithAuth,
-    tagTypes: ["Post", "User", "Comment", "Chat", "Message"],
+    tagTypes: ["Post", "User", "Comment", "Chat", "Message", "Group", "GroupRequests", "GroupMembers"],
     endpoints: () => ({}),
 });
