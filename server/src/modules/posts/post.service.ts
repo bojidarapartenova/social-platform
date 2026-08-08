@@ -33,9 +33,13 @@ export class PostService {
     }
 
     async getPostById(id: string) {
-        const post = await this.postRepo.findById(id);
+        const post = await this.postRepo.findByIdWithAuthor(id);
         if (!post) throw new Error("Post not found");
         return post;
+    }
+
+    async getPopularPosts() {
+        return this.postRepo.findPopular();
     }
 
     async getFeed(userId: string, followingIds: string[], groupIds: string[]) {

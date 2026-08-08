@@ -24,16 +24,28 @@ export async function createPost(req: Request, res: Response) {
 export async function getPost(req: Request<{ id: string }>, res: Response) {
     try {
         const post = await postService.getPostById(req.params.id);
-        res.status(200).json(post);
+        const [decorated] = await decoratePosts([post], req.user?.userId);
+        res.status(200).json(decorated);
     }
     catch (error: any) {
         res.status(404).json({ message: error.message });
     }
 }
 
-async function decoratePosts(posts: any[], userId?: string) {
+export async function getPopularPosts(req: Request, res: Response) {
+    try {
+        const posts = await postService.getPopularPosts();
+        const decorated = await decoratePosts(posts, req.user?.userId);
+        res.status(200).json(decorated);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function decoratePosts(posts: any[], userId?: string) {
     return Promise.all(
         posts.map(async (post) => {
+            const plain = typeof post.toObject === "function" ? post.toObject() : post;
             const [likeCount, commentCount, favoriteCount, likedByMe, favoritedByMe] = await Promise.all([
                 Like.countDocuments({ postId: post._id }),
                 Comment.countDocuments({ postId: post._id }),
@@ -41,7 +53,7 @@ async function decoratePosts(posts: any[], userId?: string) {
                 userId ? Like.exists({ postId: post._id, userId }) : false,
                 userId ? Bookmark.exists({ postId: post._id, userId }) : false,
             ]);
-            return { ...post.toObject(), likeCount, commentCount, favoriteCount, likedByMe: !!likedByMe, favoritedByMe: !!favoritedByMe };
+            return { ...plain, likeCount, commentCount, favoriteCount, likedByMe: !!likedByMe, favoritedByMe: !!favoritedByMe };
         })
     );
 }
