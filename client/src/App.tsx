@@ -16,6 +16,8 @@ import { GroupsListPage } from "./features/groups/GroupsListPage";
 import { CreateGroupForm } from "./features/groups/CreateGroupForm";
 import { GroupPage } from "./features/groups/GroupPage";
 import { TagPage } from "./features/posts/TagPage";
+import { SearchPage } from "./features/search/SearchPage";
+import { PostDetailPage } from "./features/posts/PostDetailPage";
 
 
 function App() {
@@ -49,6 +51,9 @@ function App() {
               />
               <Route path=":userId" element={<ChatWindow />} />
             </Route>
+
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/posts/:id" element={<PostDetailPage />} />
 
           </Route>
         </Route>

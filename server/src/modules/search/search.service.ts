@@ -8,9 +8,9 @@ function escapeRegex(str: string) {
 
 export class SearchService {
     async search(query: string) {
-        const safe = escapeRegex(query);
+        const cleanedQuery = query.replace(/^#+/, "");
+        const safe = escapeRegex(cleanedQuery);
         const regex = new RegExp(safe, "i");
-        const tagRegex = new RegExp(`#[a-zA-Z0-9_]*${safe}[a-zA-Z0-9_]*`, "i");
 
         const [users, groups, posts] = await Promise.all([
             User.find({ $or: [{ username: regex }, { name: regex }] })
@@ -19,7 +19,7 @@ export class SearchService {
             Group.find({ $or: [{ name: regex }, { description: regex }] })
                 .select("name avatarUrl description")
                 .limit(10),
-            Post.find({ caption: tagRegex })
+            Post.find({ caption: regex })
                 .sort({ createdAt: -1 })
                 .limit(40)
                 .populate("authorId", "username avatarUrl name")

@@ -34,9 +34,10 @@ export class PostRepository implements IRepository<IPost> {
             .populate("groupId", "name avatarUrl ownerId")
             .exec();
     }
+    // post.repository.ts — findPopular
     findPopular(limit = 40) {
         return Post.aggregate([
-            { $match: { type: "photo", groupId: null } },
+            { $match: { type: "photo", groupId: null, "media.0": { $exists: true } } },
             { $lookup: { from: "likes", localField: "_id", foreignField: "postId", as: "likes" } },
             { $addFields: { likeScore: { $size: "$likes" } } },
             { $sort: { likeScore: -1, createdAt: -1 } },
@@ -54,5 +55,6 @@ export class PostRepository implements IRepository<IPost> {
                 }
             },
         ]);
+
     }
 }

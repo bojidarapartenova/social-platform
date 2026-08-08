@@ -126,6 +126,10 @@ export const postApiSlice = apiSlice.injectEndpoints({
             query: (tag) => `/posts/tag/${tag}`,
             providesTags: ["Post"],
         }),
+        getPostById: builder.query<Post, string>({
+            query: (id) => `/posts/${id}`,
+            providesTags: (_r, _e, id) => [{ type: "Post", id }],
+        }),
     }),
 });
 
@@ -140,5 +144,6 @@ export const {
     useAddCommentMutation,
     useToggleFavoriteMutation,
     useDeleteCommentMutation,
-    useGetPostsByTagQuery
+    useGetPostsByTagQuery,
+    useGetPostByIdQuery
 } = postApiSlice;

@@ -358,3 +358,34 @@
     border-radius: var(--radius-md);
     font-size: 0.85rem;
 }
+
+.mediaWrapper {
+    position: relative;
+    margin-bottom: 0.4rem;
+}
+
+.mediaCountBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.mediaDots {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 6px;
+}
+
+.mediaDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-border-strong);
+    transition: background .15s;
+}
+
+.mediaDot.active {
+    background: var(--color-text);
+}

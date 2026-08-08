@@ -34,14 +34,14 @@ function BookmarkIcon({ filled }: { filled: boolean }) {
     );
 }
 
-export function PostCard({ post, isGroupOwner = false }: { post: Post; isGroupOwner?: boolean }) {
+export function PostCard({ post, isGroupOwner = false, forceShowComments = false }: { post: Post; isGroupOwner?: boolean; forceShowComments?: boolean }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
     const isOwner = currentUserId === post.authorId._id;
     const canDelete = isOwner || isGroupOwner;
 
     const [toggleLike] = useToggleLikeMutation();
     const [toggleFavorite] = useToggleFavoriteMutation();
-    const [showComments, setShowComments] = useState(false);
+    const [showComments, setShowComments] = useState(forceShowComments);
     const [showMenu, setShowMenu] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editCaption, setEditCaption] = useState(post.caption);
@@ -53,6 +53,7 @@ export function PostCard({ post, isGroupOwner = false }: { post: Post; isGroupOw
     const [commentText, setCommentText] = useState("");
     const [addComment] = useAddCommentMutation();
     const [deleteComment] = useDeleteCommentMutation();
+    const [activeSlide, setActiveSlide] = useState(0);
 
     async function handleSaveEdit() {
         await updatePost({ id: post._id, data: { caption: editCaption } });
@@ -71,6 +72,21 @@ export function PostCard({ post, isGroupOwner = false }: { post: Post; isGroupOw
         if (!commentText.trim()) return;
         await addComment({ postId: post._id, text: commentText });
         setCommentText("");
+    }
+
+    function StackIcon() {
+        return (
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                <rect x="7" y="7" width="14" height="14" rx="2" fill="black" fillOpacity="0.3" />
+                <rect x="3" y="3" width="14" height="14" rx="2" fill="black" fillOpacity="0.5" />
+            </svg>
+        );
+    }
+
+    function handleMediaScroll(e: React.UIEvent<HTMLDivElement>) {
+        const el = e.currentTarget;
+        const index = Math.round(el.scrollLeft / el.clientWidth);
+        setActiveSlide(index);
     }
 
     return (
@@ -115,10 +131,26 @@ export function PostCard({ post, isGroupOwner = false }: { post: Post; isGroupOw
             )}
 
             {post.type === "photo" && post.media?.length > 0 && (
-                <div className="mediaScroll">
-                    {post.media.map((item, i) => (
-                        <FilteredImage key={i} src={item.url} filter={item.filter} />
-                    ))}
+                <div className="mediaWrapper">
+                    {post.media.length > 1 && (
+                        <div className="mediaCountBadge">
+                            <StackIcon />
+                        </div>
+                    )}
+
+                    <div className="mediaScroll" onScroll={handleMediaScroll}>
+                        {post.media.map((item, i) => (
+                            <FilteredImage key={i} src={item.url} filter={item.filter} />
+                        ))}
+                    </div>
+
+                    {post.media.length > 1 && (
+                        <div className="mediaDots">
+                            {post.media.map((_, i) => (
+                                <span key={i} className={i === activeSlide ? "mediaDot active" : "mediaDot"} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 
