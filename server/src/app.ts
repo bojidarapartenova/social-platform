@@ -8,6 +8,7 @@ import commentRoutes from "./modules/posts/comment.routes";
 import chatRoutes from "./modules/chats/chat.routes"
 import groupRoutes from "./modules/groups/group.routes";
 import searchRoutes from "./modules/search/search.routes";
+import notificationRoutes from "./modules/notifications/notification.routes"
 
 const app = express();
 
@@ -28,5 +29,6 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/chats", chatRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 export default app;

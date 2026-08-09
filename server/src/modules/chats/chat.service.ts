@@ -1,6 +1,7 @@
 import { ConversationRepository } from "./conversation.repository";
 import { MessageRepository } from "./message.repository";
 import { Friendship } from "../follows/friendship.model";
+import { NotificationService } from "../notifications/notification.service";
 
 function sortedPair(a: string, b: string) {
     return a < b ? [a, b] : [b, a];
@@ -9,7 +10,8 @@ function sortedPair(a: string, b: string) {
 export class ChatService {
     constructor(
         private conversationRepo: ConversationRepository = new ConversationRepository(),
-        private messageRepo: MessageRepository = new MessageRepository()
+        private messageRepo: MessageRepository = new MessageRepository(),
+        private notificationService: NotificationService = new NotificationService()
     ) { }
 
     async startConversation(userId: string, otherUserId: string) {
@@ -61,6 +63,11 @@ export class ChatService {
         if (!conversation.participantIds.some((p) => p.toString() === senderId)) {
             throw new Error("Forbidden");
         }
-        return this.messageRepo.create({ conversationId, senderId, text: text.trim() } as any);
+        const message = await this.messageRepo.create({ conversationId, senderId, text: text.trim() } as any);
+
+        const recipientId = conversation.participantIds.find((p) => p.toString() !== senderId);
+        if (recipientId) await this.notificationService.notify(recipientId.toString(), senderId, "message", conversationId);
+
+        return message;
     }
 }

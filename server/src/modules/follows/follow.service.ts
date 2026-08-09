@@ -1,6 +1,9 @@
 import { Follow } from "./follow.model";
 import { Friendship } from "./friendship.model";
 import { Types } from "mongoose";
+import { NotificationService } from "../notifications/notification.service";
+
+const notificationService = new NotificationService();
 
 function sortedPair(a: Types.ObjectId, b: Types.ObjectId) {
     return a.toString() < b.toString() ? [a, b] : [b, a];
@@ -23,6 +26,7 @@ export async function followUser(followerId: string, followingId: string) {
     }
 
     await Follow.create({ followerId: followerObjId, followingId: followingObjId });
+    await notificationService.notify(followingId, followerId, "follow");
 
     const reverseFollowExists = await Follow.exists({
         followerId: followingObjId,
