@@ -18,6 +18,7 @@ import { GroupPage } from "./features/groups/GroupPage";
 import { TagPage } from "./features/posts/TagPage";
 import { SearchPage } from "./features/search/SearchPage";
 import { PostDetailPage } from "./features/posts/PostDetailPage";
+import { NotificationsPage } from "./features/notifications/NotificationsPage";
 
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
 
             <Route path="/search" element={<SearchPage />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
+            <Route path="/activity" element={<NotificationsPage />} />
 
           </Route>
         </Route>

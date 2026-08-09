@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../app/store";
 import { logout } from "../features/auth/authSlice";
 import "../styles/navigation.css"
+import { useGetUnreadCountQuery } from "../features/notifications/notificationApiSlice";
 
 import logo from '../images/logo.png'
 import homeIcon from '../images/home.png'
@@ -17,6 +18,8 @@ export function Navbar() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const currentUser = useSelector((state: RootState) => state.auth.user);
+
+    const { data: unread } = useGetUnreadCountQuery(undefined, { pollingInterval: 15000 });
 
     function handleLogout() {
         dispatch(logout());
@@ -55,6 +58,7 @@ export function Navbar() {
                 <NavLink to="/activity" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={activityIcon} alt="Activity" className="navIcon" />
                     <span>Activity</span>
+                    {!!unread?.count && <span className="navBadge">{unread.count}</span>}
                 </NavLink>
 
                 {currentUser && (

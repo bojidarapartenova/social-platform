@@ -88,3 +88,13 @@
     opacity: 0.4;
     cursor: default;
 }
+
+.navBadge {
+    background: var(--color-danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 999px;
+    margin-left: auto;
+}
