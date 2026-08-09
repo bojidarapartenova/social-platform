@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useLoginMutation } from "./authApiSlice";
 import { setCredentials } from "./authSlice";
+import { apiSlice } from "../../app/apiSlice";
 import "../../styles/logInForm.css";
 
 export default function LoginPage() {
@@ -21,6 +22,7 @@ export default function LoginPage() {
                 user: { ...result.user, name: result.user.name ?? "" },
             };
             dispatch(setCredentials(safeResult));
+            dispatch(apiSlice.util.resetApiState());
             navigate("/");
         } catch {
         }

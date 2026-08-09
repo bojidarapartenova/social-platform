@@ -4,6 +4,7 @@ import type { RootState } from "../app/store";
 import { logout } from "../features/auth/authSlice";
 import "../styles/navigation.css"
 import { useGetUnreadCountQuery } from "../features/notifications/notificationApiSlice";
+import { apiSlice } from "../app/apiSlice";
 
 import logo from '../images/logo.png'
 import homeIcon from '../images/home.png'
@@ -23,6 +24,7 @@ export function Navbar() {
 
     function handleLogout() {
         dispatch(logout());
+        dispatch(apiSlice.util.resetApiState());
         navigate('/login');
     }
 
