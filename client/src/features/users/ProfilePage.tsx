@@ -79,9 +79,8 @@ export function ProfilePage() {
                     {user.bio && <p className="profileBio">{user.bio}</p>}
 
                     <div className="profileStats">
-                        <span><strong>{user.followerCount}</strong> followers</span>
-                        <span><strong>{user.followingCount}</strong> following</span>
-                        {user.relationshipStatus === "friend" && <span className="friendBadge">Friends</span>}
+                        <Link to={`/profile/${user._id}/followers`}><strong>{user.followerCount}</strong> followers</Link>
+                        <Link to={`/profile/${user._id}/following`}><strong>{user.followingCount}</strong> following</Link>
                     </div>
 
                     {renderActionButton()}

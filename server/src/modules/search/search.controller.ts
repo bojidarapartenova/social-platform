@@ -9,7 +9,7 @@ export async function search(req: Request, res: Response) {
         const q = ((req.query.q as string) || "").trim();
         if (!q) return res.status(200).json({ users: [], groups: [], posts: [] });
 
-        const { users, groups, posts } = await searchService.search(q);
+        const { users, groups, posts } = await searchService.search(q, req.user?.userId);
         const decoratedPosts = await decoratePosts(posts, req.user?.userId);
 
         res.status(200).json({ users, groups, posts: decoratedPosts });

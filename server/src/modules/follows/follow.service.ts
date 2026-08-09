@@ -52,3 +52,27 @@ export async function unfollowUser(followerId: string, followingId: string) {
     const [userAId, userBId] = sortedPair(followerObjId, followingObjId);
     await Friendship.deleteOne({ userAId, userBId });
 }
+
+export async function getFollowers(userId: string, viewerId?: string) {
+    const follows = await Follow.find({ followingId: userId }).populate("followerId", "username name avatarUrl");
+    const users = follows.map((f: any) => f.followerId);
+    return attachFollowStatus(users, viewerId);
+}
+
+export async function getFollowing(userId: string, viewerId?: string) {
+    const follows = await Follow.find({ followerId: userId }).populate("followingId", "username name avatarUrl");
+    const users = follows.map((f: any) => f.followingId);
+    return attachFollowStatus(users, viewerId);
+}
+
+export async function attachFollowStatus(users: any[], viewerId?: string) {
+    if (!viewerId) return users.map((u) => ({ ...u.toObject(), isFollowedByMe: false, isSelf: false }));
+
+    return Promise.all(
+        users.map(async (u) => {
+            const isSelf = u._id.toString() === viewerId;
+            const isFollowedByMe = isSelf ? false : !!(await Follow.exists({ followerId: viewerId, followingId: u._id }));
+            return { ...u.toObject(), isFollowedByMe, isSelf };
+        })
+    );
+}

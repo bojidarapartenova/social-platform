@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSearchQuery, useGetPopularPostsQuery } from "./searchApiSlice";
 import { FilteredImage } from "../feed/FilteredImage";
+import { useFollowUserMutation, useUnfollowUserMutation } from "../follows/followApiSlice";
 import "../../styles/search.css";
 
 export function SearchPage() {
@@ -22,6 +23,9 @@ export function SearchPage() {
         results.groups.length === 0 &&
         results.posts.length === 0;
 
+    const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
+    const [unfollowUser, { isLoading: isUnfollowing }] = useUnfollowUserMutation();
+
     return (
         <div className="forYou">
             <p className="feedScopeSelect">Search</p>
@@ -41,21 +45,6 @@ export function SearchPage() {
                         <>
                             {isSearching && <p>Searching...</p>}
 
-                            {results && results.users.length > 0 && (
-                                <div className="searchSection">
-                                    <p className="searchSectionTitle">Users</p>
-                                    {results.users.map((u) => (
-                                        <Link key={u._id} to={`/profile/${u._id}`} className="searchResultRow">
-                                            <img src={u.avatarUrl || "/default-avatar.png"} alt={u.username} />
-                                            <div>
-                                                <span className="searchResultName">{u.name || u.username}</span>
-                                                <p className="searchResultSub">@{u.username}</p>
-                                            </div>
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
-
                             {results && results.groups.length > 0 && (
                                 <div className="searchSection">
                                     <p className="searchSectionTitle">Groups</p>
@@ -67,6 +56,35 @@ export function SearchPage() {
                                                 {g.description && <p className="searchResultSub">{g.description}</p>}
                                             </div>
                                         </Link>
+                                    ))}
+                                </div>
+                            )}
+
+                            {results && results.users.length > 0 && (
+                                <div className="searchSection">
+                                    <p className="searchSectionTitle">Users</p>
+                                    {results.users.map((u) => (
+                                        <div key={u._id} className="searchResultRow">
+                                            <Link to={`/profile/${u._id}`} className="followRowLink">
+                                                <img src={u.avatarUrl || "/default-avatar.png"} alt={u.username} />
+                                                <div>
+                                                    <span className="searchResultName">{u.name || u.username}</span>
+                                                    <p className="searchResultSub">@{u.username}</p>
+                                                </div>
+                                            </Link>
+
+                                            {!u.isSelf && (
+                                                u.isFollowedByMe ? (
+                                                    <button type="button" className="followListBtn" onClick={() => unfollowUser(u._id)} disabled={isUnfollowing}>
+                                                        Unfollow
+                                                    </button>
+                                                ) : (
+                                                    <button type="button" className="followListBtn primary" onClick={() => followUser(u._id)} disabled={isFollowing}>
+                                                        Follow
+                                                    </button>
+                                                )
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             )}

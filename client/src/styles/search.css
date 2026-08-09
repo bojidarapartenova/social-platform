@@ -116,3 +116,38 @@
     font-size: 0.9rem;
     color: var(--color-text-muted);
 }
+
+.followRowLink {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+    min-width: 0;
+}
+
+.followListBtn {
+    border: 1px solid var(--color-border-strong);
+    background: white;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.followListBtn:hover {
+    background: var(--color-hover);
+}
+
+.followListBtn.primary {
+    background: var(--color-text);
+    color: white;
+    border-color: var(--color-text);
+}
+
+.followListBtn.primary:hover {
+    opacity: 0.85;
+}

@@ -19,6 +19,7 @@ import { TagPage } from "./features/posts/TagPage";
 import { SearchPage } from "./features/search/SearchPage";
 import { PostDetailPage } from "./features/posts/PostDetailPage";
 import { NotificationsPage } from "./features/notifications/NotificationsPage";
+import { FollowListPage } from "./features/follows/FollowListPage";
 
 
 function App() {
@@ -56,6 +57,8 @@ function App() {
             <Route path="/search" element={<SearchPage />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
             <Route path="/activity" element={<NotificationsPage />} />
+            <Route path="/profile/:id/followers" element={<FollowListPage type="followers" />} />
+            <Route path="/profile/:id/following" element={<FollowListPage type="following" />} />
 
           </Route>
         </Route>
