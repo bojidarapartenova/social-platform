@@ -1,11 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { useCreatePostMutation } from "./postApiSlice";
+import { useCreatePostMutation, useUpdatePostMutation } from "./postApiSlice";
 import { setCaption, setMediaUrlAt, addMediaField, removeMediaAt, setEditingIndex, setGroupId, resetDraft } from "./postDraftSlice";
 import { useGetGroupQuery } from "../groups/groupApiSlice";
-import { useState } from "react";
 import "../../styles/postForm.css";
 
 export function CreatePostForm() {
@@ -13,13 +12,18 @@ export function CreatePostForm() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const [createPost, { isLoading }] = useCreatePostMutation();
+    const [createPost, { isLoading: isCreating }] = useCreatePostMutation();
+    const [updatePost, { isLoading: isUpdating }] = useUpdatePostMutation();
     const [formError, setFormError] = useState("");
 
+    const isEditMode = !!draft.editingPostId;
+    const isSubmitting = isEditMode ? isUpdating : isCreating;
+
     useEffect(() => {
+        if (isEditMode) return;
         const groupParam = searchParams.get("group");
         if (groupParam) dispatch(setGroupId(groupParam));
-    }, [searchParams]);
+    }, [searchParams, isEditMode]);
 
     const { data: groupInfo } = useGetGroupQuery(draft.groupId!, { skip: !draft.groupId });
 
@@ -36,16 +40,28 @@ export function CreatePostForm() {
         }
 
         try {
-            await createPost({
-                type: cleanedMedia.length > 0 ? "photo" : "text",
-                caption: trimmedCaption,
-                media: cleanedMedia.length > 0 ? cleanedMedia : undefined,
-                groupId: draft.groupId ?? undefined,
-            }).unwrap();
+            if (isEditMode) {
+                await updatePost({
+                    id: draft.editingPostId!,
+                    data: {
+                        caption: trimmedCaption,
+                        media: cleanedMedia,
+                        type: cleanedMedia.length > 0 ? "photo" : "text",
+                    },
+                }).unwrap();
+            } else {
+                await createPost({
+                    type: cleanedMedia.length > 0 ? "photo" : "text",
+                    caption: trimmedCaption,
+                    media: cleanedMedia.length > 0 ? cleanedMedia : undefined,
+                    groupId: draft.groupId ?? undefined,
+                }).unwrap();
+            }
+            const targetGroupId = draft.groupId;
             dispatch(resetDraft());
-            navigate(draft.groupId ? `/groups/${draft.groupId}` : "/");
+            navigate(targetGroupId ? `/groups/${targetGroupId}` : "/");
         } catch {
-            setFormError("Something went wrong creating your post.");
+            setFormError(isEditMode ? "Something went wrong updating your post." : "Something went wrong creating your post.");
         }
     }
 
@@ -54,12 +70,17 @@ export function CreatePostForm() {
         navigate("/create/filters");
     }
 
+    function handleCancel() {
+        dispatch(resetDraft());
+        navigate(-1);
+    }
+
     return (
         <div className="postFormPage">
             <form className="postFormCard" onSubmit={handleSubmit}>
-                <h1>New post</h1>
+                <h1>{isEditMode ? "Edit post" : "New post"}</h1>
 
-                {groupInfo && <p className="groupPostBanner">Posting in <strong>{groupInfo.name}</strong></p>}
+                {groupInfo && !isEditMode && <p className="groupPostBanner">Posting in <strong>{groupInfo.name}</strong></p>}
 
                 <textarea
                     value={draft.caption}
@@ -85,7 +106,11 @@ export function CreatePostForm() {
                     + Add a photo
                 </button>
 
-                <button type="submit" disabled={isLoading}>Post</button>
+                <div className="postFormActions">
+                    {isEditMode && <button type="button" className="cancelEditBtn" onClick={handleCancel}>Cancel</button>}
+                    <button type="submit" disabled={isSubmitting}>{isEditMode ? "Save" : "Post"}</button>
+                </div>
+
                 {formError && <p>{formError}</p>}
             </form>
         </div>

@@ -5,6 +5,7 @@ import { logout } from "../features/auth/authSlice";
 import "../styles/navigation.css"
 import { useGetUnreadCountQuery } from "../features/notifications/notificationApiSlice";
 import { apiSlice } from "../app/apiSlice";
+import { resetDraft } from "../features/posts/postDraftSlice";
 
 import logo from '../images/logo.png'
 import homeIcon from '../images/home.png'
@@ -40,7 +41,12 @@ export function Navbar() {
                     <span>Home</span>
                 </NavLink>
 
-                <NavLink to="/create" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
+                <NavLink
+                    to="create"
+                    end
+                    className={({ isActive }) => isActive ? "navItem active" : "navItem"}
+                    onClick={() => dispatch(resetDraft())}
+                >
                     <img src={newIcon} alt="New Post" className="navIcon" />
                     <span>New Post</span>
                 </NavLink>

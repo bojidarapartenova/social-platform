@@ -4,12 +4,15 @@ import type { RootState } from "../../app/store";
 import { useGetFeedQuery } from "./postApiSlice";
 import { PostCard } from "./PostCard";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { resetDraft } from "./postDraftSlice";
 import "../../styles/feed.css";
 
 export function FeedPage() {
     const [scope, setScope] = useState<"all" | "following">("all");
     const { data: posts, isLoading, error } = useGetFeedQuery(scope);
     const currentUser = useSelector((state: RootState) => state.auth.user);
+    const dispatch = useDispatch();
 
     return (
         <div className="forYou">
@@ -28,7 +31,7 @@ export function FeedPage() {
 
                         <p>What's new?</p>
                     </div>
-                    <Link to="/create">+</Link>
+                    <Link to="/create" onClick={() => dispatch(resetDraft())}>+</Link>
                 </div>
 
                 <div className="postList">

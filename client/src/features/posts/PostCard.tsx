@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
-import { Link } from "react-router-dom";
 import { FilteredImage } from "../feed/FilteredImage";
 import {
     useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation, useDeleteCommentMutation,
     useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation,
 } from "./postApiSlice";
-import type { Post } from "./postApiSlice";
+import type { Post, MediaItem } from "./postApiSlice";
 import { HashtagText } from "../../components/HashtagText";
+import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { loadDraftFromPost } from "./postDraftSlice";
 
 function HeartIcon({ filled }: { filled: boolean }) {
     return (
@@ -34,6 +36,15 @@ function BookmarkIcon({ filled }: { filled: boolean }) {
     );
 }
 
+function StackIcon() {
+    return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+            <rect x="7" y="7" width="14" height="14" rx="2" fill="black" fillOpacity="0.3" />
+            <rect x="3" y="3" width="14" height="14" rx="2" fill="black" fillOpacity="0.5" />
+        </svg>
+    );
+}
+
 export function PostCard({ post, isGroupOwner = false, forceShowComments = false }: { post: Post; isGroupOwner?: boolean; forceShowComments?: boolean }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
     const isOwner = currentUserId === post.authorId._id;
@@ -43,22 +54,70 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
     const [toggleFavorite] = useToggleFavoriteMutation();
     const [showComments, setShowComments] = useState(forceShowComments);
     const [showMenu, setShowMenu] = useState(false);
+    const [activeSlide, setActiveSlide] = useState(0);
+
     const [isEditing, setIsEditing] = useState(false);
     const [editCaption, setEditCaption] = useState(post.caption);
+    const [editMedia, setEditMedia] = useState<MediaItem[]>(post.media ?? []);
+    const [editError, setEditError] = useState("");
 
-    const [updatePost] = useUpdatePostMutation();
+    const [updatePost, { isLoading: isSavingEdit }] = useUpdatePostMutation();
     const [deletePost] = useDeletePostMutation();
 
     const { data: comments } = useGetCommentsQuery(post._id, { skip: !showComments });
     const [commentText, setCommentText] = useState("");
     const [addComment] = useAddCommentMutation();
     const [deleteComment] = useDeleteCommentMutation();
-    const [activeSlide, setActiveSlide] = useState(0);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    function handleMediaScroll(e: React.UIEvent<HTMLDivElement>) {
+        const el = e.currentTarget;
+        const index = Math.round(el.scrollLeft / el.clientWidth);
+        setActiveSlide(index);
+    }
+
+    function startEditing() {
+        dispatch(loadDraftFromPost({ id: post._id, caption: post.caption, media: post.media ?? [] }));
+        navigate("/create");
+        setShowMenu(false);
+    }
+
+    function updateEditMediaUrl(index: number, value: string) {
+        setEditMedia((prev) => prev.map((m, i) => (i === index ? { ...m, url: value } : m)));
+    }
+
+    function updateEditMediaFilter(index: number, filter: MediaItem["filter"]) {
+        setEditMedia((prev) => prev.map((m, i) => (i === index ? { ...m, filter } : m)));
+    }
+
+    function addEditMediaField() {
+        setEditMedia((prev) => [...prev, { url: "", filter: "none" }]);
+    }
+
+    function removeEditMediaField(index: number) {
+        setEditMedia((prev) => prev.filter((_, i) => i !== index));
+    }
 
     async function handleSaveEdit() {
-        await updatePost({ id: post._id, data: { caption: editCaption } });
+        const cleanedMedia = editMedia.map((m) => ({ ...m, url: m.url.trim() })).filter((m) => m.url);
+        const trimmedCaption = editCaption.trim();
+
+        if (!trimmedCaption && cleanedMedia.length === 0) {
+            setEditError("Write something or add a photo.");
+            return;
+        }
+
+        await updatePost({
+            id: post._id,
+            data: {
+                caption: trimmedCaption,
+                media: cleanedMedia,
+                type: cleanedMedia.length > 0 ? "photo" : "text",
+            },
+        });
         setIsEditing(false);
-        setShowMenu(false);
     }
 
     async function handleDelete() {
@@ -72,21 +131,6 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
         if (!commentText.trim()) return;
         await addComment({ postId: post._id, text: commentText });
         setCommentText("");
-    }
-
-    function StackIcon() {
-        return (
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <rect x="7" y="7" width="14" height="14" rx="2" fill="black" fillOpacity="0.3" />
-                <rect x="3" y="3" width="14" height="14" rx="2" fill="black" fillOpacity="0.5" />
-            </svg>
-        );
-    }
-
-    function handleMediaScroll(e: React.UIEvent<HTMLDivElement>) {
-        const el = e.currentTarget;
-        const index = Math.round(el.scrollLeft / el.clientWidth);
-        setActiveSlide(index);
     }
 
     return (
@@ -110,7 +154,7 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                         </button>
                         {showMenu && (
                             <div className="menuDropdown">
-                                {isOwner && <button type="button" onClick={() => { setIsEditing(true); setShowMenu(false); }}>Edit</button>}
+                                {isOwner && <button type="button" onClick={startEditing}>Edit</button>}
                                 <button type="button" onClick={handleDelete}>Delete</button>
                             </div>
                         )}
@@ -120,17 +164,41 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
 
             {isEditing ? (
                 <div className="editBox">
-                    <textarea value={editCaption} onChange={(e) => setEditCaption(e.target.value)} />
+                    <textarea value={editCaption} onChange={(e) => setEditCaption(e.target.value)} placeholder="What's on your mind?" />
+
+                    {editMedia.map((item, i) => (
+                        <div key={i} className="mediaRow">
+                            <input
+                                value={item.url}
+                                onChange={(e) => updateEditMediaUrl(i, e.target.value)}
+                                placeholder={`Image URL ${i + 1}`}
+                            />
+                            <select value={item.filter} onChange={(e) => updateEditMediaFilter(i, e.target.value as MediaItem["filter"])}>
+                                <option value="none">No filter</option>
+                                <option value="negative">Negative</option>
+                                <option value="blur">Blur</option>
+                                <option value="sobel">Sobel</option>
+                            </select>
+                            <button type="button" onClick={() => removeEditMediaField(i)}>Remove</button>
+                        </div>
+                    ))}
+
+                    <button type="button" className="addBtn" onClick={addEditMediaField}>
+                        + Add a photo
+                    </button>
+
+                    {editError && <p className="editError">{editError}</p>}
+
                     <div className="editActions">
                         <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-                        <button type="button" onClick={handleSaveEdit}>Save</button>
+                        <button type="button" onClick={handleSaveEdit} disabled={isSavingEdit}>Save</button>
                     </div>
                 </div>
             ) : (
                 <p className="postCaption"><HashtagText text={post.caption} /></p>
             )}
 
-            {post.type === "photo" && post.media?.length > 0 && (
+            {!isEditing && post.type === "photo" && post.media?.length > 0 && (
                 <div className="mediaWrapper">
                     {post.media.length > 1 && (
                         <div className="mediaCountBadge">

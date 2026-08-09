@@ -389,3 +389,18 @@
 .mediaDot.active {
     background: var(--color-text);
 }
+
+.mediaRow select {
+    height: 48px;
+    padding: 0 0.6rem;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 10px;
+    background: var(--color-hover);
+    font-size: 0.82rem;
+}
+
+.editError {
+    color: var(--color-danger);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
