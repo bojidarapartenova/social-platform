@@ -10,6 +10,7 @@ export interface UserProfile {
     followerCount: number;
     followingCount: number;
     relationshipStatus: "self" | "friend" | "following" | "none";
+    followsMe: boolean;
 }
 
 export interface UpdateProfileRequest {

@@ -56,7 +56,7 @@ export function ProfilePage() {
                         onClick={() => followUser(user!._id)}
                         disabled={isFollowing}
                     >
-                        Follow
+                        {user!.followsMe ? "Follow back" : "Follow"}
                     </button>
                 );
         }
@@ -81,6 +81,7 @@ export function ProfilePage() {
                     <div className="profileStats">
                         <span><strong>{user.followerCount}</strong> followers</span>
                         <span><strong>{user.followingCount}</strong> following</span>
+                        {user.relationshipStatus === "friend" && <span className="friendBadge">Friends</span>}
                     </div>
 
                     {renderActionButton()}

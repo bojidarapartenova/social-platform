@@ -6,6 +6,7 @@ import { Bookmark } from "./bookmark.model";
 import { Follow } from "../follows/follow.model";
 import { Group } from "../groups/group.model";
 import { GroupMembership } from "../groups/groupMembership.model";
+import { Friendship } from "../follows/friendship.model";
 
 const postService = new PostService();
 

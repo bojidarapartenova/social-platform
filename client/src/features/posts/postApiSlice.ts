@@ -33,6 +33,7 @@ export interface Post {
     favoriteCount: number;
     likedByMe: boolean;
     favoritedByMe: boolean;
+    isFriendAuthor: boolean;
 }
 
 interface CreatePostInput {

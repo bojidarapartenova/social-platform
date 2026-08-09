@@ -18,6 +18,8 @@ export class UserService {
         ]);
 
         let relationshipStatus: RelationshipStatus = "none";
+        let followsMe = false;
+
         if (viewerId) {
             if (viewerId === id) {
                 relationshipStatus = "self";
@@ -30,10 +32,11 @@ export class UserService {
                     const isFollowing = await Follow.exists({ followerId: viewerId, followingId: id });
                     relationshipStatus = isFollowing ? "following" : "none";
                 }
+                followsMe = !!(await Follow.exists({ followerId: id, followingId: viewerId }));
             }
         }
 
-        return { ...safeUser, followerCount, followingCount, relationshipStatus };
+        return { ...safeUser, followerCount, followingCount, relationshipStatus, followsMe };
     }
 
     async updateUser(id: string, data: { name?: string; bio?: string; avatarUrl?: string }) {
