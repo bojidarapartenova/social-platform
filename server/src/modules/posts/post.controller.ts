@@ -4,9 +4,7 @@ import { Like } from "./like.model";
 import { Comment } from "./comment.model";
 import { Bookmark } from "./bookmark.model";
 import { Follow } from "../follows/follow.model";
-import { Group } from "../groups/group.model";
 import { GroupMembership } from "../groups/groupMembership.model";
-import { Friendship } from "../follows/friendship.model";
 
 const postService = new PostService();
 

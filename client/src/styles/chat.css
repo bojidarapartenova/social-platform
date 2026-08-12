@@ -81,7 +81,7 @@
     background: var(--color-hover);
     padding: 8px 14px;
     border-radius: 16px;
-    max-width: 65%;
+    max-width: min(480px, 60vw);
     font-size: 0.9rem;
     word-break: break-word;
 }
@@ -173,4 +173,91 @@
     flex-direction: column;
     overflow: hidden;
     height: 100%;
+}
+
+.chatHeader {
+    flex-shrink: 0;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.chatHeaderLink {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.chatHeaderLink span {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.chatHeaderLink:hover span {
+    text-decoration: underline;
+}
+
+.chatHeaderLink img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chatRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    align-self: flex-start;
+}
+
+.chatRow.mine {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.chatAvatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.chatBubbleGroup {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.chatRow.mine .chatBubbleGroup {
+    align-items: flex-end;
+}
+
+.chatTime {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+    padding: 0 4px;
+}
+
+.chatSeen {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    padding: 0 4px;
+}
+
+.conversationSearchRow {
+    flex-shrink: 0;
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.conversationSearchInput {
+    width: 100%;
+    padding: 8px 14px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 999px;
+    font-size: 0.85rem;
 }

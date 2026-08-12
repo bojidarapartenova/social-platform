@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
 import { useGetFeedQuery } from "./postApiSlice";
@@ -9,8 +8,7 @@ import { resetDraft } from "./postDraftSlice";
 import "../../styles/feed.css";
 
 export function FeedPage() {
-    const [scope, setScope] = useState<"all" | "following">("all");
-    const { data: posts, isLoading, error } = useGetFeedQuery(scope);
+    const { data: posts, isLoading, error } = useGetFeedQuery();
     const currentUser = useSelector((state: RootState) => state.auth.user);
     const dispatch = useDispatch();
 

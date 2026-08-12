@@ -20,4 +20,11 @@ export class MessageRepository {
             { $group: { _id: "$conversationId", text: { $first: "$text" }, createdAt: { $first: "$createdAt" } } },
         ]);
     }
+
+    markReadForConversation(conversationId: string, readerId: string) {
+        return Message.updateMany(
+            { conversationId, senderId: { $ne: readerId }, isRead: false },
+            { isRead: true }
+        );
+    }
 }

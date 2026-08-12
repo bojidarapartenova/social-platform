@@ -19,6 +19,7 @@ export interface Message {
     conversationId: string;
     senderId: { _id: string; username: string; avatarUrl?: string };
     text: string;
+    isRead: boolean;
     createdAt: string;
 }
 

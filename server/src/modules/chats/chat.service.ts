@@ -53,6 +53,7 @@ export class ChatService {
         if (!conversation.participantIds.some((p) => p.toString() === requesterId)) {
             throw new Error("Forbidden");
         }
+        await this.messageRepo.markReadForConversation(conversationId, requesterId);
         return this.messageRepo.findByConversation(conversationId);
     }
 
