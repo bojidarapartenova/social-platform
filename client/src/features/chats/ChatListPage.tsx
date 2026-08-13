@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useGetConversationsQuery } from "./chatApiSlice";
 
 export function ChatListPage() {
-    const { data: conversations, isLoading } = useGetConversationsQuery();
+    const { data: conversations, isLoading } = useGetConversationsQuery(undefined, { pollingInterval: 5000 });
     const { userId: activeUserId } = useParams<{ userId: string }>();
     const [filterText, setFilterText] = useState("");
 
@@ -43,6 +43,7 @@ export function ChatListPage() {
                             <span className="conversationName">{c.otherUser.name || c.otherUser.username}</span>
                             <p className="conversationPreview">{c.lastMessage || "Say hi 👋"}</p>
                         </div>
+                        {c.unreadCount > 0 && <span className="conversationUnreadBadge">{c.unreadCount}</span>}
                     </Link>
                 ))}
             </div>

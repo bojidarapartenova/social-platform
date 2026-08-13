@@ -261,3 +261,23 @@
     border-radius: 999px;
     font-size: 0.85rem;
 }
+
+.conversationRow>div {
+    flex: 1;
+    min-width: 0;
+}
+
+.conversationUnreadBadge {
+    background: var(--color-danger);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    flex-shrink: 0;
+}

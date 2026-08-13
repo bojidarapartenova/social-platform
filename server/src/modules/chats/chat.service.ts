@@ -1,7 +1,6 @@
 import { ConversationRepository } from "./conversation.repository";
 import { MessageRepository } from "./message.repository";
 import { Friendship } from "../follows/friendship.model";
-import { NotificationService } from "../notifications/notification.service";
 
 function sortedPair(a: string, b: string) {
     return a < b ? [a, b] : [b, a];
@@ -10,8 +9,7 @@ function sortedPair(a: string, b: string) {
 export class ChatService {
     constructor(
         private conversationRepo: ConversationRepository = new ConversationRepository(),
-        private messageRepo: MessageRepository = new MessageRepository(),
-        private notificationService: NotificationService = new NotificationService()
+        private messageRepo: MessageRepository = new MessageRepository()
     ) { }
 
     async startConversation(userId: string, otherUserId: string) {
@@ -28,8 +26,13 @@ export class ChatService {
     async getConversations(userId: string) {
         const conversations = await this.conversationRepo.findByUser(userId);
         const ids = conversations.map((c) => c._id.toString());
-        const latestMessages = await this.messageRepo.findLatestForConversations(ids);
+
+        const [latestMessages, unreadRows] = await Promise.all([
+            this.messageRepo.findLatestForConversations(ids),
+            this.messageRepo.countUnreadGrouped(ids, userId),
+        ]);
         const latestMap = new Map(latestMessages.map((m: any) => [m._id.toString(), m]));
+        const unreadMap = new Map(unreadRows.map((r: any) => [r._id.toString(), r.count]));
 
         const summaries = conversations.map((c) => {
             const other = (c.participantIds as any[]).find((p) => p._id.toString() !== userId);
@@ -39,12 +42,20 @@ export class ChatService {
                 otherUser: other,
                 lastMessage: latest?.text ?? "",
                 lastMessageAt: latest?.createdAt ?? c.createdAt,
+                unreadCount: unreadMap.get(c._id.toString()) ?? 0,
             };
         });
 
         return summaries.sort(
             (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
         );
+    }
+
+    async getTotalUnread(userId: string) {
+        const conversations = await this.conversationRepo.findByUser(userId);
+        const ids = conversations.map((c) => c._id.toString());
+        const unreadRows = await this.messageRepo.countUnreadGrouped(ids, userId);
+        return unreadRows.reduce((sum: number, r: any) => sum + r.count, 0);
     }
 
     async getMessages(conversationId: string, requesterId: string) {
@@ -64,11 +75,6 @@ export class ChatService {
         if (!conversation.participantIds.some((p) => p.toString() === senderId)) {
             throw new Error("Forbidden");
         }
-        const message = await this.messageRepo.create({ conversationId, senderId, text: text.trim() } as any);
-
-        const recipientId = conversation.participantIds.find((p) => p.toString() !== senderId);
-        if (recipientId) await this.notificationService.notify(recipientId.toString(), senderId, "message", conversationId);
-
-        return message;
+        return this.messageRepo.create({ conversationId, senderId, text: text.trim() } as any);
     }
 }

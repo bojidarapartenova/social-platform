@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { IMessage, Message } from "./message.model";
+import { Message, IMessage } from "./message.model";
 
 export class MessageRepository {
     create(data: Partial<IMessage>) {
@@ -26,5 +26,18 @@ export class MessageRepository {
             { conversationId, senderId: { $ne: readerId }, isRead: false },
             { isRead: true }
         );
+    }
+
+    countUnreadGrouped(conversationIds: string[], userId: string) {
+        return Message.aggregate([
+            {
+                $match: {
+                    conversationId: { $in: conversationIds.map((id) => new Types.ObjectId(id)) },
+                    senderId: { $ne: new Types.ObjectId(userId) },
+                    isRead: false,
+                },
+            },
+            { $group: { _id: "$conversationId", count: { $sum: 1 } } },
+        ]);
     }
 }

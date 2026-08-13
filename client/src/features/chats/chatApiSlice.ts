@@ -12,6 +12,7 @@ export interface ConversationSummary {
     otherUser: ChatUser;
     lastMessage: string;
     lastMessageAt: string;
+    unreadCount: number;
 }
 
 export interface Message {
@@ -45,10 +46,14 @@ export const chatApiSlice = apiSlice.injectEndpoints({
             }),
             invalidatesTags: (_r, _e, { conversationId }) => [{ type: "Message", id: conversationId }, "Chat"],
         }),
+        getUnreadMessageCount: builder.query<{ count: number }, void>({
+            query: () => "/chats/unread-count",
+            providesTags: ["Chat"],
+        }),
     }),
 });
 
 export const {
     useGetConversationsQuery, useStartConversationMutation,
-    useGetMessagesQuery, useSendMessageMutation,
+    useGetMessagesQuery, useSendMessageMutation, useGetUnreadMessageCountQuery
 } = chatApiSlice;

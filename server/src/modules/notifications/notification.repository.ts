@@ -5,14 +5,14 @@ export class NotificationRepository {
         return Notification.create(data);
     }
     findByUser(userId: string, limit = 30) {
-        return Notification.find({ recipientId: userId })
+        return Notification.find({ recipientId: userId, type: { $ne: "message" } })
             .sort({ createdAt: -1 })
             .limit(limit)
             .populate("actorId", "username avatarUrl")
             .exec();
     }
     countUnread(userId: string) {
-        return Notification.countDocuments({ recipientId: userId, isRead: false });
+        return Notification.countDocuments({ recipientId: userId, isRead: false, type: { $ne: "message" } });
     }
     markAllRead(userId: string) {
         return Notification.updateMany({ recipientId: userId, isRead: false }, { isRead: true });

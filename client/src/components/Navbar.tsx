@@ -6,6 +6,7 @@ import "../styles/navigation.css"
 import { useGetUnreadCountQuery } from "../features/notifications/notificationApiSlice";
 import { apiSlice } from "../app/apiSlice";
 import { resetDraft } from "../features/posts/postDraftSlice";
+import { useGetUnreadMessageCountQuery } from "../features/chats/chatApiSlice";
 
 import logo from '../images/logo.png'
 import homeIcon from '../images/home.png'
@@ -22,6 +23,7 @@ export function Navbar() {
     const currentUser = useSelector((state: RootState) => state.auth.user);
 
     const { data: unread } = useGetUnreadCountQuery(undefined, { pollingInterval: 15000 });
+    const { data: unreadMessages } = useGetUnreadMessageCountQuery(undefined, { pollingInterval: 15000 });
 
     function handleLogout() {
         dispatch(logout());
@@ -61,6 +63,7 @@ export function Navbar() {
                 <NavLink to="/messages" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <img src={messageIcon} alt="Messages" className="navIcon" />
                     <span>Messages</span>
+                    {!!unreadMessages?.count && <span className="navBadge">{unreadMessages.count}</span>}
                 </NavLink>
 
                 <NavLink to="/activity" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>

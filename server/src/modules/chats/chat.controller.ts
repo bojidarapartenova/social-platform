@@ -42,3 +42,12 @@ export async function sendMessage(req: Request<{ conversationId: string }>, res:
         res.status(400).json({ message: error.message });
     }
 }
+
+export async function getUnreadCount(req: Request, res: Response) {
+    try {
+        const count = await chatService.getTotalUnread(req.user!.userId);
+        res.status(200).json({ count });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
