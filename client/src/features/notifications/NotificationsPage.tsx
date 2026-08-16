@@ -16,7 +16,6 @@ export function NotificationsPage() {
     const [markOneRead] = useMarkOneReadMutation();
 
     function linkFor(n: any) {
-        if (n.type === "message") return `/messages/${n.actorId._id}`;
         if (n.type === "follow") return `/profile/${n.actorId._id}`;
         if (n.entityRef) return `/posts/${n.entityRef}`;
         return "#";
@@ -40,19 +39,24 @@ export function NotificationsPage() {
                         </p>
                     )}
                     {notifications?.map((n) => (
-                        <Link
+                        <div
                             key={n._id}
-                            to={linkFor(n)}
-                            className="searchResultRow"
-                            onClick={() => !n.isRead && markOneRead(n._id)}
+                            className="notificationRow"
                             style={{ background: n.isRead ? "transparent" : "var(--color-hover)" }}
                         >
-                            <img src={n.actorId.avatarUrl || "/default-avatar.png"} alt={n.actorId.username} />
-                            <div>
-                                <span className="searchResultName">{n.actorId.username}</span>
-                                <p className="searchResultSub">{MESSAGES[n.type] ?? "sent you a notification"}</p>
-                            </div>
-                        </Link>
+                            <Link to={`/profile/${n.actorId._id}`} className="notificationActor">
+                                <img src={n.actorId.avatarUrl || "/default-avatar.png"} alt={n.actorId.username} />
+                                <span>{n.actorId.username}</span>
+                            </Link>
+
+                            <Link
+                                to={linkFor(n)}
+                                className="notificationText"
+                                onClick={() => !n.isRead && markOneRead(n._id)}
+                            >
+                                {MESSAGES[n.type] ?? "sent you a notification"}
+                            </Link>
+                        </div>
                     ))}
                 </div>
             </div>

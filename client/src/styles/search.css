@@ -151,3 +151,47 @@
 .followListBtn.primary:hover {
     opacity: 0.85;
 }
+
+.notificationRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.7rem 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.notificationActor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    flex-shrink: 0;
+}
+
+.notificationActor img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.notificationActor span {
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+
+.notificationActor:hover span {
+    text-decoration: underline;
+}
+
+.notificationText {
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    text-decoration: none;
+    flex: 1;
+}
+
+.notificationText:hover {
+    text-decoration: underline;
+}
