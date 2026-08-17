@@ -1,6 +1,6 @@
 import { Schema, model, Document, Types } from "mongoose";
 
-export type NotificationType = "like" | "comment" | "follow" | "group_invite" | "message";
+export type NotificationType = "like" | "comment" | "follow" | "group_invite" | "group_request" | "message";
 
 export interface INotification extends Document {
     recipientId: Types.ObjectId;
@@ -15,7 +15,7 @@ const notificationSchema = new Schema<INotification>(
     {
         recipientId: { type: Schema.Types.ObjectId, ref: "User", required: true },
         actorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        type: { type: String, enum: ["like", "comment", "follow", "group_invite", "message"], required: true },
+        type: { type: String, enum: ["like", "comment", "follow", "group_invite", "group_request", "message"], required: true },
         entityRef: { type: String, default: "" },
         isRead: { type: Boolean, default: false },
     },

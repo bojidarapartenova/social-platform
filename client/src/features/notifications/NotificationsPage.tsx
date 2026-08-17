@@ -6,8 +6,9 @@ const MESSAGES: Record<string, string> = {
     like: "liked your post",
     comment: "commented on your post",
     follow: "started following you",
-    message: "sent you a message",
+    group_request: "requested to join your group",
     group_invite: "invited you to a group",
+    message: "sent you a message",
 };
 
 export function NotificationsPage() {
@@ -17,6 +18,7 @@ export function NotificationsPage() {
 
     function linkFor(n: any) {
         if (n.type === "follow") return `/profile/${n.actorId._id}`;
+        if (n.type === "group_request" && n.entityRef) return `/groups/${n.entityRef}`;
         if (n.entityRef) return `/posts/${n.entityRef}`;
         return "#";
     }

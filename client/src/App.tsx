@@ -20,6 +20,8 @@ import { SearchPage } from "./features/search/SearchPage";
 import { PostDetailPage } from "./features/posts/PostDetailPage";
 import { NotificationsPage } from "./features/notifications/NotificationsPage";
 import { FollowListPage } from "./features/follows/FollowListPage";
+import { EditGroupForm } from "./features/groups/EditGroupForm";
+import { GroupMembersPage } from "./features/groups/GroupMembersPage";
 
 
 function App() {
@@ -59,6 +61,8 @@ function App() {
             <Route path="/activity" element={<NotificationsPage />} />
             <Route path="/profile/:id/followers" element={<FollowListPage type="followers" />} />
             <Route path="/profile/:id/following" element={<FollowListPage type="following" />} />
+            <Route path="/groups/:id/edit" element={<EditGroupForm />} />
+            <Route path="/groups/:id/members" element={<GroupMembersPage />} />
 
           </Route>
         </Route>

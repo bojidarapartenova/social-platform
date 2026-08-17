@@ -36,6 +36,10 @@ export const groupApiSlice = apiSlice.injectEndpoints({
             query: (body) => ({ url: "/groups", method: "POST", body }),
             invalidatesTags: ["Group"],
         }),
+        updateGroup: builder.mutation<Group, { id: string; data: { name?: string; description?: string; avatarUrl?: string } }>({
+            query: ({ id, data }) => ({ url: `/groups/${id}`, method: "PUT", body: data }),
+            invalidatesTags: (_r, _e, { id }) => [{ type: "Group", id }, "Post"],
+        }),
         requestToJoin: builder.mutation<{ message: string }, string>({
             query: (groupId) => ({ url: `/groups/${groupId}/join`, method: "POST" }),
             invalidatesTags: (_r, _e, groupId) => [{ type: "Group", id: groupId }],
@@ -64,19 +68,19 @@ export const groupApiSlice = apiSlice.injectEndpoints({
             query: ({ groupId, userId }) => ({ url: `/groups/${groupId}/members/${userId}`, method: "DELETE" }),
             invalidatesTags: (_r, _e, { groupId }) => [{ type: "GroupMembers", id: groupId }, { type: "Group", id: groupId }],
         }),
-        banMember: builder.mutation<{ message: string }, { groupId: string; userId: string }>({
-            query: ({ groupId, userId }) => ({ url: `/groups/${groupId}/members/${userId}/ban`, method: "POST" }),
-            invalidatesTags: (_r, _e, { groupId }) => [{ type: "GroupMembers", id: groupId }, { type: "Group", id: groupId }],
-        }),
         getGroupPosts: builder.query<Post[], string>({
             query: (groupId) => `/posts/group/${groupId}`,
             providesTags: ["Post"],
+        }),
+        leaveGroup: builder.mutation<{ message: string }, string>({
+            query: (groupId) => ({ url: `/groups/${groupId}/leave`, method: "POST" }),
+            invalidatesTags: (_r, _e, groupId) => [{ type: "Group", id: groupId }, "Group"],
         }),
     }),
 });
 
 export const {
-    useGetMyGroupsQuery, useGetGroupQuery, useCreateGroupMutation, useRequestToJoinMutation,
+    useGetMyGroupsQuery, useGetGroupQuery, useCreateGroupMutation, useUpdateGroupMutation, useRequestToJoinMutation,
     useGetPendingRequestsQuery, useGetMembersQuery, useApproveRequestMutation, useRejectRequestMutation,
-    useKickMemberMutation, useBanMemberMutation, useGetGroupPostsQuery,
+    useKickMemberMutation, useGetGroupPostsQuery, useLeaveGroupMutation
 } = groupApiSlice;

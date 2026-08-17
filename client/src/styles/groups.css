@@ -142,3 +142,12 @@
 .hashtag:hover {
     text-decoration: underline;
 }
+
+.profileHeader .profileNames a.username {
+    text-decoration: none;
+    color: var(--color-text-muted);
+}
+
+.profileHeader .profileNames a.username:hover {
+    text-decoration: underline;
+}

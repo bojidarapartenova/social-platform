@@ -22,6 +22,15 @@ export async function getGroup(req: Request<{ id: string }>, res: Response) {
     }
 }
 
+export async function updateGroup(req: Request<{ id: string }>, res: Response) {
+    try {
+        const group = await groupService.updateGroup(req.params.id, req.user!.userId, req.body);
+        res.status(200).json(group);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
 export async function getMyGroups(req: Request, res: Response) {
     try {
         const groups = await groupService.getMyGroups(req.user!.userId);
@@ -85,10 +94,10 @@ export async function kickMember(req: Request<{ id: string; userId: string }>, r
     }
 }
 
-export async function banMember(req: Request<{ id: string; userId: string }>, res: Response) {
+export async function leaveGroup(req: Request<{ id: string }>, res: Response) {
     try {
-        await groupService.banMember(req.params.id, req.params.userId, req.user!.userId);
-        res.status(200).json({ message: "Banned" });
+        await groupService.leaveGroup(req.params.id, req.user!.userId);
+        res.status(200).json({ message: "Left group" });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
     }

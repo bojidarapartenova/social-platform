@@ -1,10 +1,12 @@
 import { GroupRepository } from "./group.repository";
 import { GroupMembershipRepository } from "./groupMembership.repository";
+import { NotificationService } from "../notifications/notification.service";
 
 export class GroupService {
     constructor(
         private groupRepo: GroupRepository = new GroupRepository(),
-        private membershipRepo: GroupMembershipRepository = new GroupMembershipRepository()
+        private membershipRepo: GroupMembershipRepository = new GroupMembershipRepository(),
+        private notificationService: NotificationService = new NotificationService()
     ) { }
 
     async createGroup(ownerId: string, data: { name: string; description?: string; avatarUrl?: string }) {
@@ -41,6 +43,18 @@ export class GroupService {
         return { ...group.toObject(), membershipStatus, memberCount };
     }
 
+    private async assertOwner(groupId: string, requesterId: string) {
+        const group = await this.groupRepo.findById(groupId);
+        if (!group) throw new Error("Group not found");
+        if (group.ownerId.toString() !== requesterId) throw new Error("Only the group owner can do this");
+        return group;
+    }
+
+    async updateGroup(groupId: string, requesterId: string, data: { name?: string; description?: string; avatarUrl?: string }) {
+        await this.assertOwner(groupId, requesterId);
+        return this.groupRepo.updateById(groupId, data);
+    }
+
     async getMyGroups(userId: string) {
         const memberships = await this.membershipRepo.findApprovedGroupsForUser(userId);
         return memberships.map((m: any) => m.groupId);
@@ -52,14 +66,14 @@ export class GroupService {
             if (existing.status === "banned") throw new Error("You have been banned from this group");
             throw new Error("You already have a pending or active membership");
         }
-        return this.membershipRepo.create({ groupId, userId, role: "member", status: "pending" } as any);
-    }
+        const membership = await this.membershipRepo.create({ groupId, userId, role: "member", status: "pending" } as any);
 
-    private async assertOwner(groupId: string, requesterId: string) {
         const group = await this.groupRepo.findById(groupId);
-        if (!group) throw new Error("Group not found");
-        if (group.ownerId.toString() !== requesterId) throw new Error("Only the group owner can do this");
-        return group;
+        if (group) {
+            await this.notificationService.notify(group.ownerId.toString(), userId, "group_request", groupId);
+        }
+
+        return membership;
     }
 
     async getPendingRequests(groupId: string, requesterId: string) {
@@ -89,13 +103,12 @@ export class GroupService {
         return this.membershipRepo.deleteOne({ groupId, userId: targetUserId } as any);
     }
 
-    async banMember(groupId: string, targetUserId: string, requesterId: string) {
-        const group = await this.assertOwner(groupId, requesterId);
-        if (group.ownerId.toString() === targetUserId) throw new Error("Cannot ban the owner");
-        const membership = await this.membershipRepo.findByGroupAndUser(groupId, targetUserId);
-        if (!membership) {
-            return this.membershipRepo.create({ groupId, userId: targetUserId, role: "member", status: "banned" } as any);
+    async leaveGroup(groupId: string, userId: string) {
+        const group = await this.groupRepo.findById(groupId);
+        if (!group) throw new Error("Group not found");
+        if (group.ownerId.toString() === userId) {
+            throw new Error("As the owner, you can't leave your own group");
         }
-        return this.membershipRepo.updateStatus(membership._id.toString(), "banned");
+        return this.membershipRepo.deleteOne({ groupId, userId } as any);
     }
 }

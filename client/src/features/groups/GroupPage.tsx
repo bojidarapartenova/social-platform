@@ -1,8 +1,7 @@
 import { useParams, Link } from "react-router-dom";
-import { useGetGroupQuery, useRequestToJoinMutation, useGetGroupPostsQuery } from "./groupApiSlice";
+import { useGetGroupQuery, useRequestToJoinMutation, useGetGroupPostsQuery, useLeaveGroupMutation } from "./groupApiSlice";
 import { PostCard } from "../posts/PostCard";
 import { GroupRequestsPanel } from "./GroupRequestsPanel";
-import { GroupMembersPanel } from "./GroupMembersPanel";
 import { HashtagText } from "../../components/HashtagText";
 import "../../styles/groups.css";
 
@@ -11,6 +10,7 @@ export function GroupPage() {
     const { data: group, isLoading } = useGetGroupQuery(id!);
     const { data: posts, isLoading: postsLoading } = useGetGroupPostsQuery(id!);
     const [requestToJoin, { isLoading: isJoining }] = useRequestToJoinMutation();
+    const [leaveGroup, { isLoading: isLeaving }] = useLeaveGroupMutation();
 
     if (isLoading) return <p>Loading group...</p>;
     if (!group) return <p>Group not found.</p>;
@@ -19,8 +19,27 @@ export function GroupPage() {
     const isMember = isOwner || group.membershipStatus === "approved";
 
     function renderActionButton() {
-        if (isOwner) return null;
-        if (group!.membershipStatus === "approved") return <span className="groupBadge">Member</span>;
+        if (isOwner) {
+            return (
+                <Link to={`/groups/${group!._id}/edit`} className="profileBtn">
+                    Edit group
+                </Link>
+            );
+        }
+        if (group!.membershipStatus === "approved") {
+            return (
+                <button
+                    type="button"
+                    className="profileBtn"
+                    onClick={() => {
+                        if (confirm(`Leave ${group!.name}?`)) leaveGroup(group!._id);
+                    }}
+                    disabled={isLeaving}
+                >
+                    Leave group
+                </button>
+            );
+        }
         if (group!.membershipStatus === "pending") return <span className="groupBadge">Request pending</span>;
         if (group!.membershipStatus === "banned") return <span className="groupBadge banned">You've been banned from this group</span>;
         return (
@@ -39,7 +58,9 @@ export function GroupPage() {
                     <div className="profileTop">
                         <div className="profileNames">
                             <h2>{group.name}</h2>
-                            <p className="username">{group.memberCount} members</p>
+                            <Link to={`/groups/${group._id}/members`} className="username">
+                                {group.memberCount} members
+                            </Link>
                         </div>
                         <img className="profilePfp" src={group.avatarUrl || "/default-avatar.png"} alt={group.name} />
                     </div>
@@ -51,7 +72,6 @@ export function GroupPage() {
                     {renderActionButton()}
 
                     {isOwner && <GroupRequestsPanel groupId={group._id} />}
-                    {isOwner && <GroupMembersPanel groupId={group._id} />}
 
                     {isMember && (
                         <Link to={`/create?group=${group._id}`} className="profileBtn" style={{ marginTop: "0.6rem" }}>
