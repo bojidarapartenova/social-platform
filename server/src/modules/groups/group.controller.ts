@@ -40,10 +40,46 @@ export async function getMyGroups(req: Request, res: Response) {
     }
 }
 
+export async function getPendingGroups(req: Request, res: Response) {
+    try {
+        const groups = await groupService.getPendingGroups(req.user!.userId);
+        res.status(200).json(groups);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function getSuggestedGroups(req: Request, res: Response) {
+    try {
+        const groups = await groupService.getSuggestedGroups(req.user!.userId);
+        res.status(200).json(groups);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function getIncomingRequestsCount(req: Request, res: Response) {
+    try {
+        const count = await groupService.getIncomingRequestsCount(req.user!.userId);
+        res.status(200).json({ count });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
 export async function requestToJoin(req: Request<{ id: string }>, res: Response) {
     try {
         await groupService.requestToJoin(req.params.id, req.user!.userId);
         res.status(200).json({ message: "Request sent" });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function leaveGroup(req: Request<{ id: string }>, res: Response) {
+    try {
+        await groupService.leaveGroup(req.params.id, req.user!.userId);
+        res.status(200).json({ message: "Left group" });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
     }
@@ -89,15 +125,6 @@ export async function kickMember(req: Request<{ id: string; userId: string }>, r
     try {
         await groupService.kickMember(req.params.id, req.params.userId, req.user!.userId);
         res.status(200).json({ message: "Removed" });
-    } catch (error: any) {
-        res.status(400).json({ message: error.message });
-    }
-}
-
-export async function leaveGroup(req: Request<{ id: string }>, res: Response) {
-    try {
-        await groupService.leaveGroup(req.params.id, req.user!.userId);
-        res.status(200).json({ message: "Left group" });
     } catch (error: any) {
         res.status(400).json({ message: error.message });
     }

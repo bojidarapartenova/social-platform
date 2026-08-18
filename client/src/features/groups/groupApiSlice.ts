@@ -11,6 +11,10 @@ export interface Group {
     memberCount?: number;
 }
 
+export interface MyGroupSummary extends Group {
+    isOwner: boolean;
+}
+
 export interface PendingRequest {
     _id: string;
     userId: { _id: string; username: string; name?: string; avatarUrl?: string };
@@ -24,9 +28,21 @@ export interface Member {
 
 export const groupApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getMyGroups: builder.query<Group[], void>({
+        getMyGroups: builder.query<MyGroupSummary[], void>({
             query: () => "/groups/mine",
             providesTags: ["Group"],
+        }),
+        getPendingGroups: builder.query<Group[], void>({
+            query: () => "/groups/pending",
+            providesTags: ["Group"],
+        }),
+        getSuggestedGroups: builder.query<Group[], void>({
+            query: () => "/groups/suggested",
+            providesTags: ["Group"],
+        }),
+        getIncomingGroupRequestsCount: builder.query<{ count: number }, void>({
+            query: () => "/groups/requests/count",
+            providesTags: ["GroupRequests"],
         }),
         getGroup: builder.query<Group, string>({
             query: (id) => `/groups/${id}`,
@@ -42,11 +58,15 @@ export const groupApiSlice = apiSlice.injectEndpoints({
         }),
         requestToJoin: builder.mutation<{ message: string }, string>({
             query: (groupId) => ({ url: `/groups/${groupId}/join`, method: "POST" }),
-            invalidatesTags: (_r, _e, groupId) => [{ type: "Group", id: groupId }],
+            invalidatesTags: (_r, _e, groupId) => [{ type: "Group", id: groupId }, "Group"],
+        }),
+        leaveGroup: builder.mutation<{ message: string }, string>({
+            query: (groupId) => ({ url: `/groups/${groupId}/leave`, method: "POST" }),
+            invalidatesTags: (_r, _e, groupId) => [{ type: "Group", id: groupId }, "Group"],
         }),
         getPendingRequests: builder.query<PendingRequest[], string>({
             query: (groupId) => `/groups/${groupId}/requests`,
-            providesTags: (_r, _e, groupId) => [{ type: "GroupRequests", id: groupId }],
+            providesTags: (_r, _e, groupId) => [{ type: "GroupRequests", id: groupId }, "GroupRequests"],
         }),
         getMembers: builder.query<Member[], string>({
             query: (groupId) => `/groups/${groupId}/members`,
@@ -55,14 +75,14 @@ export const groupApiSlice = apiSlice.injectEndpoints({
         approveRequest: builder.mutation<{ message: string }, { groupId: string; userId: string }>({
             query: ({ groupId, userId }) => ({ url: `/groups/${groupId}/requests/${userId}/approve`, method: "POST" }),
             invalidatesTags: (_r, _e, { groupId }) => [
-                { type: "GroupRequests", id: groupId },
+                { type: "GroupRequests", id: groupId }, "GroupRequests",
                 { type: "GroupMembers", id: groupId },
-                { type: "Group", id: groupId },
+                { type: "Group", id: groupId }, "Notification",
             ],
         }),
         rejectRequest: builder.mutation<{ message: string }, { groupId: string; userId: string }>({
             query: ({ groupId, userId }) => ({ url: `/groups/${groupId}/requests/${userId}/reject`, method: "POST" }),
-            invalidatesTags: (_r, _e, { groupId }) => [{ type: "GroupRequests", id: groupId }],
+            invalidatesTags: (_r, _e, { groupId }) => [{ type: "GroupRequests", id: groupId }, "GroupRequests"],
         }),
         kickMember: builder.mutation<{ message: string }, { groupId: string; userId: string }>({
             query: ({ groupId, userId }) => ({ url: `/groups/${groupId}/members/${userId}`, method: "DELETE" }),
@@ -72,15 +92,12 @@ export const groupApiSlice = apiSlice.injectEndpoints({
             query: (groupId) => `/posts/group/${groupId}`,
             providesTags: ["Post"],
         }),
-        leaveGroup: builder.mutation<{ message: string }, string>({
-            query: (groupId) => ({ url: `/groups/${groupId}/leave`, method: "POST" }),
-            invalidatesTags: (_r, _e, groupId) => [{ type: "Group", id: groupId }, "Group"],
-        }),
     }),
 });
 
 export const {
-    useGetMyGroupsQuery, useGetGroupQuery, useCreateGroupMutation, useUpdateGroupMutation, useRequestToJoinMutation,
+    useGetMyGroupsQuery, useGetPendingGroupsQuery, useGetSuggestedGroupsQuery, useGetIncomingGroupRequestsCountQuery,
+    useGetGroupQuery, useCreateGroupMutation, useUpdateGroupMutation, useRequestToJoinMutation, useLeaveGroupMutation,
     useGetPendingRequestsQuery, useGetMembersQuery, useApproveRequestMutation, useRejectRequestMutation,
-    useKickMemberMutation, useGetGroupPostsQuery, useLeaveGroupMutation
+    useKickMemberMutation, useGetGroupPostsQuery,
 } = groupApiSlice;

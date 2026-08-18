@@ -1,4 +1,4 @@
-import { GroupMembership, IGroupMembership } from "./groupMembership.model";
+import { GroupMembership, IGroupMembership, MembershipStatus } from "./groupMembership.model";
 
 export class GroupMembershipRepository {
     create(data: Partial<IGroupMembership>) {
@@ -25,10 +25,21 @@ export class GroupMembershipRepository {
             .populate("userId", "username name avatarUrl")
             .exec();
     }
-    updateStatus(id: string, status: string) {
+    updateStatus(id: string, status: MembershipStatus) {
         return GroupMembership.findByIdAndUpdate(id, { status }, { new: true }).exec();
     }
     deleteOne(filter: Partial<IGroupMembership>) {
         return GroupMembership.deleteOne(filter).exec();
+    }
+    findByUserAndStatus(userId: string, status: MembershipStatus) {
+        return GroupMembership.find({ userId, status })
+            .populate("groupId", "name description avatarUrl ownerId")
+            .exec();
+    }
+    findAllGroupIdsForUser(userId: string) {
+        return GroupMembership.find({ userId }).select("groupId").exec();
+    }
+    countPendingForGroups(groupIds: string[]) {
+        return GroupMembership.countDocuments({ groupId: { $in: groupIds }, status: "pending" });
     }
 }

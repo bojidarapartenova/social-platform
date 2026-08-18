@@ -7,6 +7,7 @@ import { useGetUnreadCountQuery } from "../features/notifications/notificationAp
 import { apiSlice } from "../app/apiSlice";
 import { resetDraft } from "../features/posts/postDraftSlice";
 import { useGetUnreadMessageCountQuery } from "../features/chats/chatApiSlice";
+import { useGetIncomingGroupRequestsCountQuery } from "../features/groups/groupApiSlice";
 
 import logo from '../images/logo.png'
 import homeIcon from '../images/home.png'
@@ -24,6 +25,7 @@ export function Navbar() {
 
     const { data: unread } = useGetUnreadCountQuery(undefined, { pollingInterval: 15000 });
     const { data: unreadMessages } = useGetUnreadMessageCountQuery(undefined, { pollingInterval: 15000 });
+    const { data: incomingRequests } = useGetIncomingGroupRequestsCountQuery(undefined, { pollingInterval: 15000 });
 
     function handleLogout() {
         dispatch(logout());
@@ -87,6 +89,7 @@ export function Navbar() {
                 <br />
                 <NavLink to="/groups" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
                     <span>Groups</span>
+                    {!!incomingRequests?.count && <span className="navBadge">{incomingRequests.count}</span>}
                 </NavLink>
             </nav>
 

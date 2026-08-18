@@ -56,8 +56,26 @@ export class GroupService {
     }
 
     async getMyGroups(userId: string) {
-        const memberships = await this.membershipRepo.findApprovedGroupsForUser(userId);
+        const memberships = await this.membershipRepo.findByUserAndStatus(userId, "approved");
+        return memberships.map((m: any) => ({ ...m.groupId.toObject(), isOwner: m.role === "owner" }));
+    }
+
+    async getPendingGroups(userId: string) {
+        const memberships = await this.membershipRepo.findByUserAndStatus(userId, "pending");
         return memberships.map((m: any) => m.groupId);
+    }
+
+    async getSuggestedGroups(userId: string) {
+        const existing = await this.membershipRepo.findAllGroupIdsForUser(userId);
+        const excludeIds = existing.map((m: any) => m.groupId.toString());
+        return this.groupRepo.findSuggestions(excludeIds);
+    }
+
+    async getIncomingRequestsCount(userId: string) {
+        const memberships = await this.membershipRepo.findByUserAndStatus(userId, "approved");
+        const ownedGroupIds = memberships.filter((m: any) => m.role === "owner").map((m: any) => m.groupId._id.toString());
+        if (ownedGroupIds.length === 0) return 0;
+        return this.membershipRepo.countPendingForGroups(ownedGroupIds);
     }
 
     async requestToJoin(groupId: string, userId: string) {
@@ -89,7 +107,13 @@ export class GroupService {
         await this.assertOwner(groupId, requesterId);
         const membership = await this.membershipRepo.findByGroupAndUser(groupId, targetUserId);
         if (!membership) throw new Error("Request not found");
-        return this.membershipRepo.updateStatus(membership._id.toString(), "approved");
+
+        const updated = await this.membershipRepo.updateStatus(membership._id.toString(), "approved");
+
+        await this.notificationService.notify(targetUserId, requesterId, "group_accept", groupId);
+        await this.notificationService.markReadForGroupRequest(requesterId, targetUserId, groupId);
+
+        return updated;
     }
 
     async rejectRequest(groupId: string, targetUserId: string, requesterId: string) {

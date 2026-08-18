@@ -24,4 +24,8 @@ export class NotificationService {
     async markOneRead(id: string, userId: string) {
         return this.notifRepo.markOneRead(id, userId);
     }
+
+    async markReadForGroupRequest(ownerId: string, requesterId: string, groupId: string) {
+        return this.notifRepo.markReadByActorTypeEntity(ownerId, requesterId, "group_request", groupId);
+    }
 }

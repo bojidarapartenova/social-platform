@@ -1,4 +1,4 @@
-import { Notification, INotification } from "./notification.model";
+import { Notification, INotification, NotificationType } from "./notification.model";
 
 export class NotificationRepository {
     create(data: Partial<INotification>) {
@@ -19,5 +19,11 @@ export class NotificationRepository {
     }
     markOneRead(id: string, userId: string) {
         return Notification.findOneAndUpdate({ _id: id, recipientId: userId }, { isRead: true }, { new: true });
+    }
+    markReadByActorTypeEntity(recipientId: string, actorId: string, type: NotificationType, entityRef: string) {
+        return Notification.updateMany(
+            { recipientId, actorId, type, entityRef, isRead: false },
+            { isRead: true }
+        );
     }
 }
