@@ -1,6 +1,5 @@
 import { Bookmark, IBookmark } from "./bookmark.model";
-import { Like } from "./like.model";
-import { Comment } from "./comment.model";
+import { decoratePosts } from "./post.controller";
 
 export class BookmarkRepository {
     findOne(filter: Partial<IBookmark>) {
@@ -23,36 +22,18 @@ export class BookmarkRepository {
         const bookmarks = await Bookmark.find({ userId })
             .populate({
                 path: "postId",
-                populate: { path: "authorId", select: "username name avatarUrl" }
+                populate: [
+                    { path: "authorId", select: "username name avatarUrl" },
+                    { path: "groupId", select: "name avatarUrl ownerId" },
+                ],
             })
             .sort({ createdAt: -1 })
             .exec();
 
-        const userLikes = await Like.find({ userId }).select("postId").exec();
-        const likedPostIds = new Set(userLikes.map((l) => l.postId.toString()));
+        const posts = bookmarks
+            .filter((b) => b.postId !== null)
+            .map((b) => b.postId as any);
 
-        const favoritedPosts = await Promise.all(
-            bookmarks
-                .filter((b) => b.postId !== null)
-                .map(async (b) => {
-                    const post = (b.postId as any).toObject();
-                    const postIdStr = post._id.toString();
-
-                    const likeCount = await Like.countDocuments({ postId: post._id });
-                    const commentCount = await Comment.countDocuments({ postId: post._id });
-                    const favoriteCount = await Bookmark.countDocuments({ postId: post._id });
-
-                    return {
-                        ...post,
-                        likeCount: post.likeCount ?? likeCount,
-                        commentCount: post.commentCount ?? commentCount,
-                        favoriteCount,
-                        favoritedByMe: true,
-                        likedByMe: likedPostIds.has(postIdStr),
-                    };
-                })
-        );
-
-        return favoritedPosts;
+        return decoratePosts(posts, userId);
     }
 }

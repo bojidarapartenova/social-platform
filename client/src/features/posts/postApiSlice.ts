@@ -33,7 +33,6 @@ export interface Post {
     favoriteCount: number;
     likedByMe: boolean;
     favoritedByMe: boolean;
-    isFriendAuthor: boolean;
 }
 
 interface CreatePostInput {
@@ -45,8 +44,8 @@ interface CreatePostInput {
 
 export const postApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getFeed: builder.query<Post[], "all" | "following" | void>({
-            query: (scope) => `/posts/feed?scope=${scope ?? "all"}`,
+        getFeed: builder.query<Post[], void>({
+            query: () => "/posts/feed",
             providesTags: ["Post"],
         }),
         getFavoritePosts: builder.query<Post[], void>({
@@ -112,7 +111,7 @@ export const postApiSlice = apiSlice.injectEndpoints({
             invalidatesTags: ["Post"],
             async onQueryStarted(postId, { dispatch, queryFulfilled }) {
                 const patch = dispatch(
-                    postApiSlice.util.updateQueryData("getFeed", "all", (draft) => {
+                    postApiSlice.util.updateQueryData("getFeed", undefined, (draft) => {
                         const post = draft.find((p) => p._id === postId);
                         if (post) {
                             post.favoritedByMe = !post.favoritedByMe;
