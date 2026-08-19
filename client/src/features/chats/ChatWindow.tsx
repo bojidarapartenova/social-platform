@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Fragment } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
@@ -8,7 +8,29 @@ import "../../styles/feed.css";
 import "../../styles/chat.css";
 
 function formatTime(iso: string) {
-    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+}
+
+function isSameDay(iso1: string, iso2: string) {
+    const d1 = new Date(iso1);
+    const d2 = new Date(iso2);
+    return (
+        d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate()
+    );
+}
+
+function formatDateHeader(iso: string) {
+    const date = new Date(iso);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (isSameDay(iso, today.toISOString())) return "Today";
+    if (isSameDay(iso, yesterday.toISOString())) return "Yesterday";
+
+    return date.toLocaleDateString([], { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
 export function ChatWindow() {
@@ -37,10 +59,11 @@ export function ChatWindow() {
         return () => { cancelled = true; };
     }, [userId]);
 
-    const { data: messages } = useGetMessagesQuery(conversationId!, {
+    const { data: messages, isLoading: messagesLoading } = useGetMessagesQuery(conversationId!, {
         skip: !conversationId,
         pollingInterval: 3000,
     });
+
     const [sendMessage, { isLoading: isSending }] = useSendMessageMutation();
 
     useEffect(() => {
@@ -78,21 +101,36 @@ export function ChatWindow() {
             )}
 
             <div className="chatMessages">
-                {messages?.map((m) => {
+                {(!conversationId || messagesLoading) && !error && (
+                    <p style={{ textAlign: "center", color: "var(--color-text-muted)", marginTop: "1rem" }}>
+                        Loading conversation...
+                    </p>
+                )}
+                {messages?.map((m, index) => {
                     const isMine = m.senderId._id === currentUserId;
+                    const prevMessage = messages[index - 1];
+                    const showDateSeparator = !prevMessage || !isSameDay(prevMessage.createdAt, m.createdAt);
+
                     return (
-                        <div key={m._id} className={isMine ? "chatRow mine" : "chatRow"}>
-                            {!isMine && (
-                                <img className="chatAvatar" src={m.senderId.avatarUrl || "/default-avatar.png"} alt={m.senderId.username} />
+                        <Fragment key={m._id}>
+                            {showDateSeparator && (
+                                <div className="chatDateSeparator">
+                                    <span>{formatDateHeader(m.createdAt)}</span>
+                                </div>
                             )}
-                            <div className="chatBubbleGroup">
-                                <div className={isMine ? "chatBubble mine" : "chatBubble"}>{m.text}</div>
-                                <span className="chatTime">{formatTime(m.createdAt)}</span>
-                                {isMine && m._id === lastMineId && lastMineIsRead && (
-                                    <span className="chatSeen">Seen</span>
+                            <div className={isMine ? "chatRow mine" : "chatRow"}>
+                                {!isMine && (
+                                    <img className="chatAvatar" src={m.senderId.avatarUrl || "/default-avatar.png"} alt={m.senderId.username} />
                                 )}
+                                <div className="chatBubbleGroup">
+                                    <div className={isMine ? "chatBubble mine" : "chatBubble"}>{m.text}</div>
+                                    <span className="chatTime">{formatTime(m.createdAt)}</span>
+                                    {isMine && m._id === lastMineId && lastMineIsRead && (
+                                        <span className="chatSeen">Seen</span>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </Fragment>
                     );
                 })}
                 <div ref={bottomRef} />

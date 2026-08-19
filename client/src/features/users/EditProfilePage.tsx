@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store";
@@ -23,11 +23,14 @@ export function EditProfilePage() {
 
     const dispatch = useDispatch();
 
+    const hasHydrated = useRef(false);
+
     useEffect(() => {
-        if (user) {
+        if (user && !hasHydrated.current) {
             setName(user.name || "");
             setBio(user.bio || "");
             setAvatarUrl(user.avatarUrl || "");
+            hasHydrated.current = true;
         }
     }, [user]);
 

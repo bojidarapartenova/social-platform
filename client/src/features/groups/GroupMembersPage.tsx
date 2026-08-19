@@ -6,11 +6,12 @@ import "../../styles/search.css";
 export function GroupMembersPage() {
     const { id } = useParams<{ id: string }>();
     const [filterText, setFilterText] = useState("");
-    const { data: group } = useGetGroupQuery(id!);
-    const { data: members, isLoading } = useGetMembersQuery(id!);
+    const { data: group, isLoading: groupLoading } = useGetGroupQuery(id!);
+    const { data: members, isLoading: membersLoading } = useGetMembersQuery(id!);
     const [kickMember] = useKickMemberMutation();
 
     const isOwner = group?.membershipStatus === "owner";
+    const isLoading = groupLoading || membersLoading;
 
     const filtered = members?.filter((m) => {
         const q = filterText.trim().toLowerCase();

@@ -1,5 +1,7 @@
 .filterPage {
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -30,7 +32,6 @@
     margin-bottom: 1.5rem;
 }
 
-/* Image Preview Container */
 .previewScroll {
     width: 100%;
     border-radius: 12px;
@@ -50,7 +51,6 @@
     display: block;
 }
 
-/* Filter Options Grid/List */
 .filterOptions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -86,7 +86,6 @@
     opacity: .9;
 }
 
-/* Action Row (Cancel & Apply Buttons) */
 .actionRow {
     display: flex;
     gap: 12px;

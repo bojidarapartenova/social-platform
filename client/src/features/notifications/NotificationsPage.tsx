@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { Link } from "react-router-dom";
 import { useGetNotificationsQuery, useMarkAllReadMutation, useMarkOneReadMutation } from "./notificationApiSlice";
 import "../../styles/search.css";
@@ -11,6 +12,32 @@ const MESSAGES: Record<string, string> = {
     group_invite: "invited you to a group",
     message: "sent you a message",
 };
+
+function formatTime(iso: string) {
+    return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+}
+
+function isSameDay(iso1: string, iso2: string) {
+    const d1 = new Date(iso1);
+    const d2 = new Date(iso2);
+    return (
+        d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate()
+    );
+}
+
+function formatDateHeader(iso: string) {
+    const date = new Date(iso);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (isSameDay(iso, today.toISOString())) return "Today";
+    if (isSameDay(iso, yesterday.toISOString())) return "Yesterday";
+
+    return date.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
 
 export function NotificationsPage() {
     const { data: notifications, isLoading } = useGetNotificationsQuery();
@@ -41,26 +68,39 @@ export function NotificationsPage() {
                             Nothing yet.
                         </p>
                     )}
-                    {notifications?.map((n) => (
-                        <div
-                            key={n._id}
-                            className="notificationRow"
-                            style={{ background: n.isRead ? "transparent" : "var(--color-hover)" }}
-                        >
-                            <Link to={`/profile/${n.actorId._id}`} className="notificationActor">
-                                <img src={n.actorId.avatarUrl || "/default-avatar.png"} alt={n.actorId.username} />
-                                <span>{n.actorId.username}</span>
-                            </Link>
+                    {notifications?.map((n, index) => {
+                        const prevNotification = notifications[index - 1];
+                        const showDateSeparator = !prevNotification || !isSameDay(prevNotification.createdAt, n.createdAt);
 
-                            <Link
-                                to={linkFor(n)}
-                                className="notificationText"
-                                onClick={() => !n.isRead && markOneRead(n._id)}
-                            >
-                                {MESSAGES[n.type] ?? "sent you a notification"}
-                            </Link>
-                        </div>
-                    ))}
+                        return (
+                            <Fragment key={n._id}>
+                                {showDateSeparator && (
+                                    <div className="chatDateSeparator">
+                                        <span>{formatDateHeader(n.createdAt)}</span>
+                                    </div>
+                                )}
+                                <div
+                                    className="notificationRow"
+                                    style={{ background: n.isRead ? "transparent" : "var(--color-hover)" }}
+                                >
+                                    <Link to={`/profile/${n.actorId._id}`} className="notificationActor">
+                                        <img src={n.actorId.avatarUrl || "/default-avatar.png"} alt={n.actorId.username} />
+                                        <span>{n.actorId.username}</span>
+                                    </Link>
+
+                                    <Link
+                                        to={linkFor(n)}
+                                        className="notificationText"
+                                        onClick={() => !n.isRead && markOneRead(n._id)}
+                                    >
+                                        {MESSAGES[n.type] ?? "sent you a notification"}
+                                    </Link>
+
+                                    <span className="chatTime">{formatTime(n.createdAt)}</span>
+                                </div>
+                            </Fragment>
+                        );
+                    })}
                 </div>
             </div>
         </div>

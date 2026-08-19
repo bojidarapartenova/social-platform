@@ -266,3 +266,20 @@
     color: var(--color-text);
     margin-bottom: 6px;
 }
+
+.chatDateSeparator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem 0;
+    width: 100%;
+}
+
+.chatDateSeparator span {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #8e8e8e);
+    background-color: var(--color-bg-secondary, #f0f0f0);
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+}

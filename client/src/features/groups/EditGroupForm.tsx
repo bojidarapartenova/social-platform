@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetGroupQuery, useUpdateGroupMutation } from "./groupApiSlice";
 import "../../styles/postForm.css";
@@ -14,11 +14,14 @@ export function EditGroupForm() {
     const [avatarUrl, setAvatarUrl] = useState("");
     const [formError, setFormError] = useState("");
 
+    const hasHydrated = useRef(false);
+
     useEffect(() => {
-        if (group) {
+        if (group && !hasHydrated.current) {
             setName(group.name);
             setDescription(group.description);
             setAvatarUrl(group.avatarUrl);
+            hasHydrated.current = true;
         }
     }, [group]);
 
