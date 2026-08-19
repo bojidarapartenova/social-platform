@@ -11,6 +11,7 @@ export interface RegisterInput {
     email: string;
     password: string;
     avatarUrl?: string;
+    bio?: string;
 }
 
 interface AuthResponse {

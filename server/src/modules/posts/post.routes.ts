@@ -10,6 +10,7 @@ import { getGroupPosts } from "./post.controller";
 import { getPostsByTag } from "./post.controller";
 import { optionalAuth } from "../../common/middleware/auth.middleware";
 import { getPopularPosts } from "./post.controller";
+import { getSuggestedPosts } from "./post.controller";
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.post("/", requireAuth, validate(createPostSchema), createPost);
 router.get("/group/:groupId", requireAuth, getGroupPosts);
 router.get("/tag/:tag", optionalAuth, getPostsByTag);
 router.get("/popular", optionalAuth, getPopularPosts);
+router.get("/suggested", requireAuth, getSuggestedPosts);
 router.get("/:id", optionalAuth, getPost);
 router.put("/:id", requireAuth, updatePost);
 router.delete("/:id", requireAuth, deletePost);

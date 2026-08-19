@@ -9,6 +9,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [avatarUrl, setAvatarUrl] = useState("");
+    const [bio, setBio] = useState("");
 
     const [register, { isLoading, error }] = useRegisterMutation();
     const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function RegisterPage() {
                 email,
                 password,
                 avatarUrl: avatarUrl.trim() || undefined,
+                bio,
             }).unwrap();
 
             navigate("/login");
@@ -65,6 +67,9 @@ export default function RegisterPage() {
                         onChange={(e) => setAvatarUrl(e.target.value)}
                         placeholder="https://example.com/pfp.png (optional)"
                     />
+
+                    <label htmlFor="bio">Bio</label>
+                    <input id="bio" type="text" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Add bio" />
 
                     <button type="submit" disabled={isLoading}>GET STARTED</button>
 

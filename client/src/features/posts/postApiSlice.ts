@@ -1,4 +1,5 @@
 import { apiSlice } from "../../app/apiSlice";
+import { useGetPopularPostsQuery } from "../search/searchApiSlice";
 
 export interface MediaItem {
     url: string;
@@ -130,6 +131,10 @@ export const postApiSlice = apiSlice.injectEndpoints({
             query: (id) => `/posts/${id}`,
             providesTags: (_r, _e, id) => [{ type: "Post", id }],
         }),
+        getSuggestedPosts: builder.query<Post[], void>({
+            query: () => "/posts/suggested",
+            providesTags: ["Post"],
+        }),
     }),
 });
 
@@ -145,5 +150,6 @@ export const {
     useToggleFavoriteMutation,
     useDeleteCommentMutation,
     useGetPostsByTagQuery,
-    useGetPostByIdQuery
+    useGetPostByIdQuery,
+    useGetSuggestedPostsQuery
 } = postApiSlice;

@@ -42,6 +42,10 @@ export class PostService {
         return this.postRepo.findPopular();
     }
 
+    async getSuggestions(userId?: string) {
+        return this.postRepo.findSuggestions(userId);
+    }
+
     async getFeed(userId: string, followingIds: string[], groupIds: string[]) {
         return this.postRepo.findManyWithAuthor({
             $or: [

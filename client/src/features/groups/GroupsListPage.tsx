@@ -4,28 +4,28 @@ import { useGetMyGroupsQuery, useGetPendingGroupsQuery, useGetSuggestedGroupsQue
 import type { Group, MyGroupSummary } from "./groupApiSlice";
 import "../../styles/groups.css";
 
-type Tab = "mine" | "pending" | "explore";
+type Tab = "explore" | "mine" | "pending";
 
 const TAB_LABELS: Record<Tab, string> = {
+    explore: "Explore",
     mine: "My Groups",
     pending: "Pending",
-    explore: "Explore",
 };
 
 const EMPTY_MESSAGES: Record<Tab, string> = {
+    explore: "No suggestions right now.",
     mine: "You're not a member of any group yet.",
     pending: "No pending requests.",
-    explore: "No suggestions right now.",
 };
 
 export function GroupsListPage() {
-    const [tab, setTab] = useState<Tab>("mine");
+    const [tab, setTab] = useState<Tab>("explore");
 
+    const explore = useGetSuggestedGroupsQuery(undefined, { skip: tab !== "explore" });
     const mine = useGetMyGroupsQuery(undefined, { skip: tab !== "mine" });
     const pending = useGetPendingGroupsQuery(undefined, { skip: tab !== "pending" });
-    const explore = useGetSuggestedGroupsQuery(undefined, { skip: tab !== "explore" });
 
-    const active = { mine, pending, explore }[tab];
+    const active = { explore, mine, pending }[tab];
     const groups: (Group | MyGroupSummary)[] | undefined = active.data;
     const isLoading = active.isLoading;
 

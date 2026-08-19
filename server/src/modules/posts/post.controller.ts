@@ -41,6 +41,16 @@ export async function getPopularPosts(req: Request, res: Response) {
     }
 }
 
+export async function getSuggestedPosts(req: Request, res: Response) {
+    try {
+        const userId = req.user?.userId?.toString();
+        const posts = await postService.getSuggestions(userId);
+        res.status(200).json(posts);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
 export async function decoratePosts(posts: any[], userId?: string) {
     return Promise.all(
         posts.map(async (post) => {
