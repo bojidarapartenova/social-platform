@@ -27,9 +27,13 @@ export const followApiSlice = apiSlice.injectEndpoints({
             query: (userId) => `/follows/${userId}/following`,
             providesTags: ["FollowList"],
         }),
+        getFriends: builder.query<FollowUser[], void>({
+            query: () => "/follows/friends",
+            providesTags: ["FollowList"],
+        }),
     }),
 });
 
 export const {
-    useFollowUserMutation, useUnfollowUserMutation, useGetFollowersQuery, useGetFollowingQuery,
+    useFollowUserMutation, useUnfollowUserMutation, useGetFollowersQuery, useGetFollowingQuery, useGetFriendsQuery
 } = followApiSlice;

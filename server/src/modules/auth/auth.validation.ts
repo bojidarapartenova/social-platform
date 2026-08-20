@@ -10,6 +10,8 @@ export const registerSchema = yup.object({
         .string()
         .matches(passwordRegex, "Password must be at least 10 characters and include one uppercase letter, one digit, and one special character")
         .required(),
+    avatarUrl: yup.string().default(""),
+    bio: yup.string().max(300).default(""),
 });
 
 export const loginSchema = yup.object({

@@ -30,21 +30,21 @@ interface SeedUser {
 }
 
 const USERS: SeedUser[] = [
-    { username: "admin", name: "Admin Account", email: "admin@seed.local", bio: "Platform administrator.", avatarUrl: "https://i.pravatar.cc/300?img=12" },
-    { username: "sophia_bloom", name: "Sophia Bloom", email: "sophia@seed.local", bio: "Photographer & coffee addict ☕📸", avatarUrl: "https://i.pravatar.cc/300?img=5" },
-    { username: "marcus_lee", name: "Marcus Lee", email: "marcus@seed.local", bio: "Software engineer, gamer, dog dad 🐶", avatarUrl: "https://i.pravatar.cc/300?img=13" },
-    { username: "aria_moon", name: "Aria Moon", email: "aria@seed.local", bio: "Fashion & lifestyle blogger", avatarUrl: "https://i.pravatar.cc/300?img=9" },
-    { username: "leo_martins", name: "Leo Martins", email: "leo@seed.local", bio: "Travel more, worry less ✈️", avatarUrl: "https://i.pravatar.cc/300?img=14" },
-    { username: "nina_park", name: "Nina Park", email: "nina@seed.local", bio: "UI/UX designer | plant mom 🌿", avatarUrl: "https://i.pravatar.cc/300?img=16" },
-    { username: "daniel_cruz", name: "Daniel Cruz", email: "daniel@seed.local", bio: "Fitness coach 💪", avatarUrl: "https://i.pravatar.cc/300?img=15" },
-    { username: "elena_ross", name: "Elena Ross", email: "elena@seed.local", bio: "Bookworm 📚 | tea over coffee", avatarUrl: "https://i.pravatar.cc/300?img=20" },
-    { username: "kevin_shaw", name: "Kevin Shaw", email: "kevin@seed.local", bio: "Street photography enthusiast", avatarUrl: "https://i.pravatar.cc/300?img=17" },
-    { username: "maya_singh", name: "Maya Singh", email: "maya@seed.local", bio: "Foodie. Always hungry 🍜", avatarUrl: "https://i.pravatar.cc/300?img=25" },
-    { username: "oliver_king", name: "Oliver King", email: "oliver@seed.local", bio: "Musician 🎸 | indie rock", avatarUrl: "https://i.pravatar.cc/300?img=33" },
-    { username: "ivy_chen", name: "Ivy Chen", email: "ivy@seed.local", bio: "Digital artist ✨", avatarUrl: "https://i.pravatar.cc/300?img=45" },
-    { username: "ryan_cole", name: "Ryan Cole", email: "ryan@seed.local", bio: "Runner. Coffee snob.", avatarUrl: "https://i.pravatar.cc/300?img=52" },
-    { username: "zara_ahmed", name: "Zara Ahmed", email: "zara@seed.local", bio: "Med student, cat person 🐱", avatarUrl: "https://i.pravatar.cc/300?img=47" },
-    { username: "tom_becker", name: "Tom Becker", email: "tom@seed.local", bio: "Just here for the memes", avatarUrl: "https://i.pravatar.cc/300?img=53" },
+    { username: "admin", name: "Admin Account", email: "admin@seed.local", bio: "Platform administrator.", avatarUrl: "/images/admin.jpg" },
+    { username: "sophia_bloom", name: "Sophia Bloom", email: "sophia@seed.local", bio: "Photographer & coffee addict ☕📸", avatarUrl: "/images/female1.jpg" },
+    { username: "marcus_lee", name: "Marcus Lee", email: "marcus@seed.local", bio: "Software engineer, gamer, dog dad 🐶", avatarUrl: "/images/male1.jpg" },
+    { username: "aria_moon", name: "Aria Moon", email: "aria@seed.local", bio: "Fashion & lifestyle blogger", avatarUrl: "/images/female2.jpg" },
+    { username: "leo_martins", name: "Leo Martins", email: "leo@seed.local", bio: "Travel more, worry less ✈️", avatarUrl: "/images/male2.jpg" },
+    { username: "nina_park", name: "Nina Park", email: "nina@seed.local", bio: "UI/UX designer | plant mom 🌿", avatarUrl: "/images/female3.jpg" },
+    { username: "daniel_cruz", name: "Daniel Cruz", email: "daniel@seed.local", bio: "Fitness coach 💪", avatarUrl: "/images/male3.jpg" },
+    { username: "elena_ross", name: "Elena Ross", email: "elena@seed.local", bio: "Bookworm 📚 | tea over coffee", avatarUrl: "/images/female4.jpg" },
+    { username: "kevin_shaw", name: "Kevin Shaw", email: "kevin@seed.local", bio: "Street photography enthusiast", avatarUrl: "/images/male4.jpg" },
+    { username: "maya_singh", name: "Maya Singh", email: "maya@seed.local", bio: "Foodie. Always hungry 🍜", avatarUrl: "/images/female5.jpg" },
+    { username: "oliver_king", name: "Oliver King", email: "oliver@seed.local", bio: "Musician 🎸 | indie rock", avatarUrl: "/images/male5.jpg" },
+    { username: "ivy_chen", name: "Ivy Chen", email: "ivy@seed.local", bio: "Digital artist ✨", avatarUrl: "/images/female6.jpg" },
+    { username: "ryan_cole", name: "Ryan Cole", email: "ryan@seed.local", bio: "Runner. Coffee snob.", avatarUrl: "/images/male6.jpg" },
+    { username: "zara_ahmed", name: "Zara Ahmed", email: "zara@seed.local", bio: "Med student, cat person 🐱", avatarUrl: "/images/female7.jpg" },
+    { username: "tom_becker", name: "Tom Becker", email: "tom@seed.local", bio: "Just here for the memes", avatarUrl: "/images/male7.jpg" },
 ];
 
 async function seedUsers(): Promise<Record<string, string>> {
@@ -54,7 +54,7 @@ async function seedUsers(): Promise<Record<string, string>> {
         let userId: string;
         try {
             const created = await authService.registerUser(u.name, u.username, u.email, PASSWORD);
-            userId = created._id.toString();
+            userId = created.user._id.toString();
             await userRepo.updateById(userId, { bio: u.bio, avatarUrl: u.avatarUrl });
             console.log(`Created user: ${u.username}`);
         } catch {
@@ -114,11 +114,11 @@ async function seedFollows(userIds: Record<string, string>) {
 
 async function seedGroups(userIds: Record<string, string>): Promise<Record<string, string>> {
     const groupsData = [
-        { owner: "sophia_bloom", name: "Photography Lovers", description: "A place to share your best shots. #photography #travel", avatarUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2j_mJTEYa_4B1t4E3npUn3DbUIGc8uwyzqIurv_cXCHQZIIOHZMtMVZw&s=10" },
-        { owner: "daniel_cruz", name: "Fitness & Wellness", description: "Workouts, recipes, and motivation. #fitness #health", avatarUrl: "https://i.pinimg.com/236x/68/e8/1f/68e81f991759486c11948fe6e6ab28f8.jpg" },
-        { owner: "aria_moon", name: "Fashion Forward", description: "Outfits, trends, and style inspo. #fashion #ootd", avatarUrl: "https://luxiders.com/content/uploads/hannah-morgan-ycVFts5Ma4s-unsplash.jpeg" },
-        { owner: "oliver_king", name: "Indie Music Club", description: "Discover new artists and share your favorites. #music", avatarUrl: "https://i.pinimg.com/736x/22/3a/78/223a787008c70db79baa786483aee9f1.jpg" },
-    ];
+        { owner: "sophia_bloom", name: "Photography Lovers", description: "A place to share your best shots. #photography #travel", avatarUrl: "/images/group1.jpg" },
+        { owner: "daniel_cruz", name: "Fitness & Wellness", description: "Workouts, recipes, and motivation. #fitness #health", avatarUrl: "/images/group2.jpg" },
+        { owner: "aria_moon", name: "Fashion Forward", description: "Outfits, trends, and style inspo. #fashion #ootd", avatarUrl: "/images/group3.jpg" },
+        { owner: "oliver_king", name: "Indie Music Club", description: "Discover new artists and share your favorites. #music", avatarUrl: "/images/group4.jpg" }
+    ]
 
     const groupIds: Record<string, string> = {};
 
@@ -178,30 +178,29 @@ async function seedPosts(userIds: Record<string, string>, groupIds: Record<strin
         { author: "sophia_bloom", caption: "Golden hour never disappoints 🌅 #photography #sunset", media: [{ url: "https://picsum.photos/seed/sunset1/800/600", filter: "none" }] },
         {
             author: "sophia_bloom", caption: "Street shots from today's walk #photography #streetphoto", media: [
-                { url: "https://paintbynumbers.uk/wp-content/uploads/2020/08/Aesthetic-road-paint-by-numbers.jpg", filter: "none" },
-                { url: "https://wallpapersok.com/images/hd/new-york-aesthetic-street-9efn806yao7b7tpa.jpg", filter: "sobel" },
-                { url: "https://i.pinimg.com/736x/60/46/02/604602bb238e235d984369d5a4edd472.jpg", filter: "negative" },
+                { url: "/images/post1.jpg", filter: "none" },
+                { url: "/images/post1.jpg", filter: "sobel" },
             ]
         },
         { author: "marcus_lee", caption: "Finally beat this boss after 20 tries lol #gaming" },
-        { author: "marcus_lee", caption: "New desk setup, feeling productive #tech", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfCEe416mQ4gWt3hf_dSxCkmNP9EaF8hX4lG0gp7aP1po6wuXibrb6xzef&s=10", filter: "none" }] },
-        { author: "aria_moon", caption: "Today's fit 🧥 #fashion #ootd", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRva_4RWiLdUkRLyKxPix5bkqpfYuyrOaC7aO5PjyP5Ag&s=10", filter: "none" }] },
-        { author: "leo_martins", caption: "Somewhere in the Alps ⛰️ #travel", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRstdjca4wVuCTouzkFmI-Hzu6UdRPq1LVA8rzN8cNV-w&s=10", filter: "blur" }] },
-        { author: "nina_park", caption: "New plant baby 🌿 #plants", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnGwMmK8NiDjEjLBntyrEOyUDg9SmltKK_nLUxkt2IoQ&s=10", filter: "none" }] },
+        { author: "marcus_lee", caption: "New desk setup, feeling productive #tech", media: [{ url: "/images/post2.jpg", filter: "none" }] },
+        { author: "aria_moon", caption: "Today's fit 🧥 #fashion #ootd", media: [{ url: "/images/post3.jpg", filter: "none" }] },
+        { author: "leo_martins", caption: "Somewhere in the Alps ⛰️ #travel", media: [{ url: "/images/post4.jpg", filter: "blur" }] },
+        { author: "nina_park", caption: "New plant baby 🌿 #plants", media: [{ url: "/images/post5.jpg", filter: "none" }] },
         { author: "daniel_cruz", caption: "Leg day complete 🔥 #fitness" },
-        { author: "elena_ross", caption: "Currently reading this masterpiece 📖 #books", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMY9Ed0PyhYn_XT8d478TGsGLVlddI4fY0snzYuKT_WA&s=10", filter: "none" }] },
-        { author: "kevin_shaw", caption: "Rainy city nights #streetphoto #photography", media: [{ url: "https://plus.unsplash.com/premium_photo-1669927131902-a64115445f0f?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2l0eSUyMG5pZ2h0fGVufDB8fDB8fHww", filter: "negative" }] },
-        { author: "maya_singh", caption: "Homemade ramen night 🍜 #food", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5bdaajsNdjEQpLc6edirUnl1agS1I1jiLBjDs31Yz4g&s=10", filter: "none" }] },
+        { author: "elena_ross", caption: "Currently reading this masterpiece 📖 #books", media: [{ url: "/images/post6.jpg", filter: "none" }] },
+        { author: "kevin_shaw", caption: "Rainy city nights #streetphoto #photography", media: [{ url: "/images/post7.jpg", filter: "negative" }] },
+        { author: "maya_singh", caption: "Homemade ramen night 🍜 #food", media: [{ url: "/images/post8.jpg", filter: "none" }] },
         { author: "oliver_king", caption: "New track dropping this Friday 🎸 #music" },
-        { author: "ivy_chen", caption: "Latest digital piece #art", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT05RkPuukvEOgC7sbQG4ccVsafzk4UDCNJRsRAH9ZbAQ&s=10", filter: "none" }] },
+        { author: "ivy_chen", caption: "Latest digital piece #art", media: [{ url: "/images/post9.jpg", filter: "none" }] },
         { author: "ryan_cole", caption: "10k done ✅ #running #fitness" },
-        { author: "zara_ahmed", caption: "Studying with my study buddy 🐱 #catsofinstagram", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmt63QG25Xgzd8ALX4Rd0IdReKf6nzQrv8gi2E23r00A&s=10", filter: "none" }] },
-        { author: "tom_becker", caption: "no caption needed #memes", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStOzDoS14WEsBqF7faLGhxE4voqyorhwKuwQN-Ab1Fsg&s=10", filter: "none" }] },
-        { author: "marcus_lee", caption: "My entry for this week #photography", group: "Photography Lovers", media: [{ url: "https://picsum.photos/seed/gpost1/800/600", filter: "none" }] },
-        { author: "kevin_shaw", caption: "Feedback welcome! #photography", group: "Photography Lovers", media: [{ url: "https://picsum.photos/seed/gpost2/800/600", filter: "sobel" }] },
-        { author: "nina_park", caption: "Morning routine that changed my life #fitness", group: "Fitness & Wellness" },
-        { author: "ryan_cole", caption: "Meal prep Sunday #fitness #food", group: "Fitness & Wellness", media: [{ url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNtx3GcjY3VRYD2jI0Sy-ipwS7n5Wr0iAu_2A-qKCRrQ&s=10", filter: "none" }] },
-        { author: "elena_ross", caption: "Thrifted this gem today #fashion", group: "Fashion Forward", media: [{ url: "https://i.pinimg.com/736x/c2/19/22/c2192268511d3296fca8e9182a656d04.jpg", filter: "none" }] },
+        { author: "zara_ahmed", caption: "Studying with my study buddy 🐱 #catsofinstagram", media: [{ url: "/images/post10.jpg", filter: "none" }] },
+        { author: "tom_becker", caption: "no caption needed #memes", media: [{ url: "/images/post1.jpg", filter: "none" }] },
+        { author: "marcus_lee", caption: "My entry for this week #photography", group: "Photography Lovers", media: [{ url: "/images/post11.jpg", filter: "none" }] },
+        { author: "kevin_shaw", caption: "Feedback welcome! #photography", group: "Photography Lovers", media: [{ url: "/images/post12.jpg", filter: "sobel" }] },
+        { author: "nina_park", caption: "What's the morning routine that changed your life? #fitness", group: "Fitness & Wellness" },
+        { author: "ryan_cole", caption: "Meal prep Sunday #fitness #food", group: "Fitness & Wellness", media: [{ url: "/images/post13.jpg", filter: "none" }] },
+        { author: "elena_ross", caption: "Thrifted this gem today #fashion", group: "Fashion Forward", media: [{ url: "/images/post14.jpg", filter: "none" }] },
         { author: "ivy_chen", caption: "Been on repeat all week #music", group: "Indie Music Club" },
     ];
 

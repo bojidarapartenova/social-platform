@@ -72,6 +72,14 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    function formatTime(iso: string) {
+        return new Date(iso).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
+    }
+
     function handleMediaScroll(e: React.UIEvent<HTMLDivElement>) {
         const el = e.currentTarget;
         const index = Math.round(el.scrollLeft / el.clientWidth);
@@ -243,6 +251,8 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                     <BookmarkIcon filled={post.favoritedByMe} /> {post.favoriteCount}
                 </button>
             </div>
+
+            <span className="chatTime">{formatTime(post.createdAt)}</span>
 
             {showComments && (
                 <div className="commentSection">

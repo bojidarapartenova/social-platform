@@ -76,3 +76,14 @@ export async function attachFollowStatus(users: any[], viewerId?: string) {
         })
     );
 }
+
+export async function getFriends(userId: string) {
+    const friendships = await Friendship.find({
+        $or: [{ userAId: userId }, { userBId: userId }],
+    }).populate("userAId userBId", "username name avatarUrl");
+
+    return friendships.map((f: any) => {
+        const isUserA = f.userAId._id.toString() === userId;
+        return isUserA ? f.userBId : f.userAId;
+    });
+}

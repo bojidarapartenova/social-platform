@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { useRegisterMutation } from "./authApiSlice";
+import { setCredentials } from "./authSlice";
 import "../../styles/logInForm.css";
 
 export default function RegisterPage() {
@@ -12,12 +14,13 @@ export default function RegisterPage() {
     const [bio, setBio] = useState("");
 
     const [register, { isLoading, error }] = useRegisterMutation();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         try {
-            await register({
+            const result = await register({
                 name,
                 username,
                 email,
@@ -26,7 +29,12 @@ export default function RegisterPage() {
                 bio,
             }).unwrap();
 
-            navigate("/login");
+            dispatch(setCredentials({
+                token: result.token,
+                user: { ...result.user, name: result.user.name ?? "" },
+            }));
+
+            navigate("/");
         } catch (err: any) {
             console.error("Register error:", err);
         }

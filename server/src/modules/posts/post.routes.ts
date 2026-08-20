@@ -4,7 +4,7 @@ import { toggleLike } from "./like.controller";
 import { addComment, getComments } from "./comment.controller";
 import { requireAuth } from "../../common/middleware/auth.middleware";
 import { validate } from "../../common/middleware/validate.middleware";
-import { createPostSchema } from "./post.validation";
+import { createPostSchema, updatePostSchema } from "./post.validation";
 import { toggleFavorite, getFavorites } from "./bookmark.controller";
 import { getGroupPosts } from "./post.controller";
 import { getPostsByTag } from "./post.controller";
@@ -22,7 +22,7 @@ router.get("/tag/:tag", optionalAuth, getPostsByTag);
 router.get("/popular", optionalAuth, getPopularPosts);
 router.get("/suggested", requireAuth, getSuggestedPosts);
 router.get("/:id", optionalAuth, getPost);
-router.put("/:id", requireAuth, updatePost);
+router.put("/:id", requireAuth, validate(updatePostSchema), updatePost);
 router.delete("/:id", requireAuth, deletePost);
 
 router.post("/:postId/likes", requireAuth, toggleLike);
