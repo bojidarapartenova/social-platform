@@ -258,7 +258,11 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                 <div className="commentSection">
                     {comments?.map((c) => (
                         <div key={c._id} className="comment">
-                            <span className="commentAuthor">{c.authorId.username}</span> {c.text}
+
+                            <Link to={`/profile/${c.authorId._id}`} className="postAuthorLink">
+                                <span className="commentAuthor">{c.authorId.username}</span> {c.text}
+                            </Link>
+
                             {c.authorId._id === currentUserId && (
                                 <button type="button" className="deleteCommentBtn" onClick={() => deleteComment({ id: c._id, postId: post._id })}>✕</button>
                             )}
