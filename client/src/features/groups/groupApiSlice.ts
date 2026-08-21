@@ -92,6 +92,10 @@ export const groupApiSlice = apiSlice.injectEndpoints({
             query: (groupId) => `/posts/group/${groupId}`,
             providesTags: ["Post"],
         }),
+        deleteGroup: builder.mutation<{ message: string }, string>({
+            query: (id) => ({ url: `/groups/${id}`, method: "DELETE" }),
+            invalidatesTags: ["Group", "Post"],
+        }),
     }),
 });
 
@@ -99,5 +103,5 @@ export const {
     useGetMyGroupsQuery, useGetPendingGroupsQuery, useGetSuggestedGroupsQuery, useGetIncomingGroupRequestsCountQuery,
     useGetGroupQuery, useCreateGroupMutation, useUpdateGroupMutation, useRequestToJoinMutation, useLeaveGroupMutation,
     useGetPendingRequestsQuery, useGetMembersQuery, useApproveRequestMutation, useRejectRequestMutation,
-    useKickMemberMutation, useGetGroupPostsQuery,
+    useKickMemberMutation, useGetGroupPostsQuery, useDeleteGroupMutation
 } = groupApiSlice;

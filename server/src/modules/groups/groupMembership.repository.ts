@@ -42,4 +42,8 @@ export class GroupMembershipRepository {
     countPendingForGroups(groupIds: string[]) {
         return GroupMembership.countDocuments({ groupId: { $in: groupIds }, status: "pending" });
     }
+
+    deleteManyByGroup(groupId: string) {
+        return GroupMembership.deleteMany({ groupId }).exec();
+    }
 }

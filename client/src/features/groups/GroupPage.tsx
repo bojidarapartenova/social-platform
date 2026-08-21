@@ -1,5 +1,5 @@
-import { useParams, Link } from "react-router-dom";
-import { useGetGroupQuery, useRequestToJoinMutation, useGetGroupPostsQuery, useLeaveGroupMutation } from "./groupApiSlice";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useGetGroupQuery, useRequestToJoinMutation, useGetGroupPostsQuery, useDeleteGroupMutation } from "./groupApiSlice";
 import { PostCard } from "../posts/PostCard";
 import { GroupRequestsPanel } from "./GroupRequestsPanel";
 import { HashtagText } from "../../components/HashtagText";
@@ -10,7 +10,8 @@ export function GroupPage() {
     const { data: group, isLoading } = useGetGroupQuery(id!);
     const { data: posts, isLoading: postsLoading } = useGetGroupPostsQuery(id!);
     const [requestToJoin, { isLoading: isJoining }] = useRequestToJoinMutation();
-    const [leaveGroup, { isLoading: isLeaving }] = useLeaveGroupMutation();
+    const [deleteGroup, { isLoading: isDeleting }] = useDeleteGroupMutation();
+    const navigate = useNavigate();
 
     if (isLoading) return <p>Loading group...</p>;
     if (!group) return <p>Group not found.</p>;
@@ -18,28 +19,27 @@ export function GroupPage() {
     const isOwner = group.membershipStatus === "owner";
     const isMember = isOwner || group.membershipStatus === "approved";
 
+    async function handleDelete() {
+        if (confirm(`Delete "${group!.name}" permanently? This will also delete all of its posts.`)) {
+            await deleteGroup(group!._id);
+            navigate("/groups");
+        }
+    }
+
     function renderActionButton() {
         if (isOwner) {
             return (
-                <Link to={`/groups/${group!._id}/edit`} className="profileBtn">
-                    Edit group
-                </Link>
+                <div className="btnRow">
+                    <Link to={`/groups/${group!._id}/edit`} className="profileBtn">
+                        Edit group
+                    </Link>
+                    <button type="button" className="profileBtn deleteGroupBtn" onClick={handleDelete} disabled={isDeleting}>
+                        Delete group
+                    </button>
+                </div>
             );
         }
-        if (group!.membershipStatus === "approved") {
-            return (
-                <button
-                    type="button"
-                    className="profileBtn"
-                    onClick={() => {
-                        if (confirm(`Leave ${group!.name}?`)) leaveGroup(group!._id);
-                    }}
-                    disabled={isLeaving}
-                >
-                    Leave group
-                </button>
-            );
-        }
+        if (group!.membershipStatus === "approved") return <span className="groupBadge">Member</span>;
         if (group!.membershipStatus === "pending") return <span className="groupBadge">Request pending</span>;
         if (group!.membershipStatus === "banned") return <span className="groupBadge banned">You've been banned from this group</span>;
         return (

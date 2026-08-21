@@ -188,3 +188,13 @@
     padding: 1px 8px;
     border-radius: 999px;
 }
+
+.deleteGroupBtn {
+    color: var(--color-danger);
+    border-color: var(--color-danger);
+}
+
+.deleteGroupBtn:hover {
+    background: var(--color-danger);
+    color: white;
+}

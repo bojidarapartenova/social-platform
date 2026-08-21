@@ -1,6 +1,10 @@
 import { GroupRepository } from "./group.repository";
 import { GroupMembershipRepository } from "./groupMembership.repository";
 import { NotificationService } from "../notifications/notification.service";
+import { Post } from "../posts/post.model";
+import { Like } from "../posts/like.model";
+import { Comment } from "../posts/comment.model";
+import { Bookmark } from "../posts/bookmark.model";
 
 export class GroupService {
     constructor(
@@ -134,5 +138,22 @@ export class GroupService {
             throw new Error("As the owner, you can't leave your own group");
         }
         return this.membershipRepo.deleteOne({ groupId, userId } as any);
+    }
+
+    async deleteGroup(groupId: string, requesterId: string) {
+        await this.assertOwner(groupId, requesterId);
+
+        const groupPosts = await Post.find({ groupId }).select("_id");
+        const postIds = groupPosts.map((p) => p._id);
+
+        await Promise.all([
+            Like.deleteMany({ postId: { $in: postIds } }),
+            Comment.deleteMany({ postId: { $in: postIds } }),
+            Bookmark.deleteMany({ postId: { $in: postIds } }),
+            Post.deleteMany({ groupId }),
+            this.membershipRepo.deleteManyByGroup(groupId),
+        ]);
+
+        await this.groupRepo.deleteById(groupId);
     }
 }

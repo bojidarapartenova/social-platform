@@ -129,3 +129,12 @@ export async function kickMember(req: Request<{ id: string; userId: string }>, r
         res.status(400).json({ message: error.message });
     }
 }
+
+export async function deleteGroup(req: Request<{ id: string }>, res: Response) {
+    try {
+        await groupService.deleteGroup(req.params.id, req.user!.userId);
+        res.status(200).json({ message: "Group deleted" });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}

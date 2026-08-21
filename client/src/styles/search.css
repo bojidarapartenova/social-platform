@@ -195,3 +195,41 @@
 .notificationText:hover {
     text-decoration: underline;
 }
+
+.searchGridItem {
+    position: relative;
+    cursor: pointer;
+}
+
+.searchGridOverlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transition: opacity .15s;
+}
+
+.searchGridItem:hover .searchGridOverlay {
+    opacity: 1;
+}
+
+.gridOverlayBtn {
+    background: none;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.gridOverlayBtn.liked {
+    color: var(--color-danger);
+}
+
+.gridOverlayBtn.favorited {
+    color: var(--color-star);
+}

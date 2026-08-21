@@ -31,4 +31,8 @@ export class GroupRepository {
             { $limit: limit },
         ]);
     }
+
+    deleteById(id: string) {
+        return Group.findByIdAndDelete(id).exec();
+    }
 }

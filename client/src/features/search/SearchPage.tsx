@@ -1,9 +1,40 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSearchQuery, useGetPopularPostsQuery } from "./searchApiSlice";
 import { FilteredImage } from "../feed/FilteredImage";
 import { useFollowUserMutation, useUnfollowUserMutation } from "../follows/followApiSlice";
+import { useToggleLikeMutation, useToggleFavoriteMutation } from "../posts/postApiSlice";
+import type { Post } from "../posts/postApiSlice";
 import "../../styles/search.css";
+
+function ExploreGridTile({ post }: { post: Post }) {
+    const navigate = useNavigate();
+    const [toggleLike] = useToggleLikeMutation();
+    const [toggleFavorite] = useToggleFavoriteMutation();
+
+    return (
+        <div className="searchGridItem" onClick={() => navigate(`/posts/${post._id}`)}>
+            {post.media?.[0] && <FilteredImage src={post.media[0].url} filter={post.media[0].filter} />}
+
+            <div className="searchGridOverlay">
+                <button
+                    type="button"
+                    className={post.likedByMe ? "gridOverlayBtn liked" : "gridOverlayBtn"}
+                    onClick={(e) => { e.stopPropagation(); toggleLike(post._id); }}
+                >
+                    ♥ {post.likeCount}
+                </button>
+                <button
+                    type="button"
+                    className={post.favoritedByMe ? "gridOverlayBtn favorited" : "gridOverlayBtn"}
+                    onClick={(e) => { e.stopPropagation(); toggleFavorite(post._id); }}
+                >
+                    ★ {post.favoriteCount}
+                </button>
+            </div>
+        </div>
+    );
+}
 
 export function SearchPage() {
     const [inputValue, setInputValue] = useState("");
@@ -122,9 +153,7 @@ export function SearchPage() {
                             {isLoadingPopular && <p>Loading...</p>}
                             <div className="searchGrid">
                                 {popularPosts?.map((post) => (
-                                    <Link key={post._id} to={`/posts/${post._id}`} className="searchGridItem">
-                                        {post.media?.[0] && <FilteredImage src={post.media[0].url} filter={post.media[0].filter} />}
-                                    </Link>
+                                    <ExploreGridTile key={post._id} post={post} />
                                 ))}
                             </div>
                         </>
