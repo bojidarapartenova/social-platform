@@ -61,9 +61,10 @@ export class PostRepository implements IRepository<IPost> {
 
     async findSuggestions(userId?: string, limit = 20) {
         let preferredAuthorIds: Types.ObjectId[] = [];
+        const userObjectId = userId ? new Types.ObjectId(userId) : null;
 
         if (userId) {
-            const userLikes = await Like.find({ userId: new Types.ObjectId(userId) }).select("postId").exec();
+            const userLikes = await Like.find({ userId: userObjectId }).select("postId").exec();
             const likedPostIds = userLikes.map((l) => l.postId);
 
             if (likedPostIds.length > 0) {
@@ -76,15 +77,31 @@ export class PostRepository implements IRepository<IPost> {
 
         return Post.aggregate([
             { $match: { type: "photo", groupId: null, "media.0": { $exists: true } } },
+
             { $lookup: { from: "likes", localField: "_id", foreignField: "postId", as: "likes" } },
-            { $addFields: { likeScore: { $size: "$likes" } } },
+
+            { $lookup: { from: "comments", localField: "_id", foreignField: "postId", as: "comments" } },
+
+            { $lookup: { from: "bookmarks", localField: "_id", foreignField: "postId", as: "favorites" } },
+
             {
                 $addFields: {
+                    likeCount: { $size: "$likes" },
+                    commentCount: { $size: "$comments" },
+                    favoriteCount: { $size: "$favorites" },
+                    likedByMe: userObjectId
+                        ? { $in: [userObjectId, "$likes.userId"] }
+                        : false,
+                    favoritedByMe: userObjectId
+                        ? { $in: [userObjectId, "$favorites.userId"] }
+                        : false,
                     isPreferred: { $in: ["$authorId", preferredAuthorIds] },
                 },
             },
-            { $sort: { isPreferred: -1, likeScore: -1, createdAt: -1 } },
+
+            { $sort: { isPreferred: -1, likeCount: -1, createdAt: -1 } },
             { $limit: limit },
+
             { $lookup: { from: "users", localField: "authorId", foreignField: "_id", as: "authorId" } },
             { $unwind: "$authorId" },
             {
@@ -97,6 +114,8 @@ export class PostRepository implements IRepository<IPost> {
                     },
                 },
             },
+
+            { $project: { likes: 0, comments: 0, favorites: 0 } }
         ]);
     }
 }

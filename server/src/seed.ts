@@ -175,32 +175,41 @@ async function seedPosts(userIds: Record<string, string>, groupIds: Record<strin
     };
 
     const posts: SeedPost[] = [
-        { author: "sophia_bloom", caption: "Golden hour never disappoints 🌅 #photography #sunset", media: [{ url: "https://picsum.photos/seed/sunset1/800/600", filter: "none" }] },
         {
             author: "sophia_bloom", caption: "Street shots from today's walk #photography #streetphoto", media: [
                 { url: "/images/post1.jpg", filter: "none" },
-                { url: "/images/post1.jpg", filter: "sobel" },
+                { url: "/images/post1.jpg", filter: "blur" },
             ]
         },
         { author: "marcus_lee", caption: "Finally beat this boss after 20 tries lol #gaming" },
         { author: "marcus_lee", caption: "New desk setup, feeling productive #tech", media: [{ url: "/images/post2.jpg", filter: "none" }] },
-        { author: "aria_moon", caption: "Today's fit 🧥 #fashion #ootd", media: [{ url: "/images/post3.jpg", filter: "none" }] },
-        { author: "leo_martins", caption: "Somewhere in the Alps ⛰️ #travel", media: [{ url: "/images/post4.jpg", filter: "blur" }] },
+        {
+            author: "aria_moon", caption: "Today's fit 🧥 #fashion #ootd", media: [
+                { url: "/images/post3.jpg", filter: "none" },
+                { url: "/images/post3.jpg", filter: "sobel" },
+            ]
+        },
+        { author: "leo_martins", caption: "Somewhere in the Alps ⛰️ #travel", media: [{ url: "/images/post4.jpg", filter: "none" }] },
         { author: "nina_park", caption: "New plant baby 🌿 #plants", media: [{ url: "/images/post5.jpg", filter: "none" }] },
         { author: "daniel_cruz", caption: "Leg day complete 🔥 #fitness" },
         { author: "elena_ross", caption: "Currently reading this masterpiece 📖 #books", media: [{ url: "/images/post6.jpg", filter: "none" }] },
-        { author: "kevin_shaw", caption: "Rainy city nights #streetphoto #photography", media: [{ url: "/images/post7.jpg", filter: "negative" }] },
+        {
+            author: "kevin_shaw", caption: "Rainy city nights #streetphoto #photography", media: [
+                { url: "/images/post7.jpg", filter: "none" },
+                { url: "/images/post7.jpg", filter: "negative" },
+            ]
+        },
         { author: "maya_singh", caption: "Homemade ramen night 🍜 #food", media: [{ url: "/images/post8.jpg", filter: "none" }] },
         { author: "oliver_king", caption: "New track dropping this Friday 🎸 #music" },
         { author: "ivy_chen", caption: "Latest digital piece #art", media: [{ url: "/images/post9.jpg", filter: "none" }] },
         { author: "ryan_cole", caption: "10k done ✅ #running #fitness" },
-        { author: "zara_ahmed", caption: "Studying with my study buddy 🐱 #catsofinstagram", media: [{ url: "/images/post10.jpg", filter: "none" }] },
-        { author: "tom_becker", caption: "no caption needed #memes", media: [{ url: "/images/post1.jpg", filter: "none" }] },
-        { author: "marcus_lee", caption: "My entry for this week #photography", group: "Photography Lovers", media: [{ url: "/images/post11.jpg", filter: "none" }] },
-        { author: "kevin_shaw", caption: "Feedback welcome! #photography", group: "Photography Lovers", media: [{ url: "/images/post12.jpg", filter: "sobel" }] },
+        { author: "zara_ahmed", caption: "Studying with my study buddy 🐱 #catsofinternet", media: [{ url: "/images/post10.jpg", filter: "none" }] },
+        { author: "tom_becker", caption: "no caption needed #memes", media: [{ url: "/images/post11.jpg", filter: "none" }] },
+        { author: "marcus_lee", caption: "My entry for this week #photography", group: "Photography Lovers", media: [{ url: "/images/post12.jpg", filter: "none" }] },
+        { author: "kevin_shaw", caption: "Feedback welcome! #photography", group: "Photography Lovers", media: [{ url: "/images/post13.jpg", filter: "sobel" }] },
         { author: "nina_park", caption: "What's the morning routine that changed your life? #fitness", group: "Fitness & Wellness" },
-        { author: "ryan_cole", caption: "Meal prep Sunday #fitness #food", group: "Fitness & Wellness", media: [{ url: "/images/post13.jpg", filter: "none" }] },
-        { author: "elena_ross", caption: "Thrifted this gem today #fashion", group: "Fashion Forward", media: [{ url: "/images/post14.jpg", filter: "none" }] },
+        { author: "ryan_cole", caption: "Meal prep Sunday #fitness #food", group: "Fitness & Wellness", media: [{ url: "/images/post14.jpg", filter: "none" }] },
+        { author: "elena_ross", caption: "Thrifted this gem today #fashion", group: "Fashion Forward", media: [{ url: "/images/post15.jpg", filter: "none" }] },
         { author: "ivy_chen", caption: "Been on repeat all week #music", group: "Indie Music Club" },
     ];
 

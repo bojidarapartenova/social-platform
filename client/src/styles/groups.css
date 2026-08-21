@@ -73,10 +73,15 @@
     margin-bottom: 0.6rem;
 }
 
+.reqProfile {
+    display: flex;
+    gap: 10px;
+}
+
 .groupRequestRow {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     padding: 6px 0;
 }
 
