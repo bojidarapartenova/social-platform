@@ -18,12 +18,6 @@ export function ChatListPage() {
         return c.otherUser.username.toLowerCase().includes(q) || (c.otherUser.name ?? "").toLowerCase().includes(q);
     });
 
-    const filteredFriends = friendsWithoutChat?.filter((f) => {
-        const q = filterText.trim().toLowerCase();
-        if (!q) return true;
-        return f.username.toLowerCase().includes(q) || (f.name ?? "").toLowerCase().includes(q);
-    });
-
     return (
         <>
             <div className="conversationSearchRow">
@@ -52,6 +46,45 @@ export function ChatListPage() {
                         {c.unreadCount > 0 && <span className="conversationUnreadBadge">{c.unreadCount}</span>}
                     </Link>
                 ))}
+
+                {friendsWithoutChat
+                    ?.filter((friend) => {
+                        const q = filterText.trim().toLowerCase();
+
+                        if (!q) return true;
+
+                        return (
+                            friend.username.toLowerCase().includes(q) ||
+                            (friend.name ?? "").toLowerCase().includes(q)
+                        );
+                    })
+                    .map((friend) => (
+                        <Link
+                            key={friend._id}
+                            to={`/messages/${friend._id}`}
+                            className={
+                                friend._id === activeUserId
+                                    ? "conversationRow active"
+                                    : "conversationRow"
+                            }
+                        >
+                            <img
+                                src={friend.avatarUrl || "/default-avatar.png"}
+                                alt={friend.username}
+                            />
+
+                            <div>
+                                <span className="conversationName">
+                                    {friend.name || friend.username}
+                                </span>
+
+                                <p className="conversationPreview">
+                                    Say hi 👋
+                                </p>
+                            </div>
+                        </Link>
+                    ))}
+
 
                 {conversations?.length === 0 && (!friendsWithoutChat || friendsWithoutChat.length === 0) && (
                     <p className="conversationEmpty">No conversations or friends yet.</p>

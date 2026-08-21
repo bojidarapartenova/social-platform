@@ -30,15 +30,15 @@ export const groupApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getMyGroups: builder.query<MyGroupSummary[], void>({
             query: () => "/groups/mine",
-            providesTags: ["Group"],
+            providesTags: ["GroupList"],
         }),
         getPendingGroups: builder.query<Group[], void>({
             query: () => "/groups/pending",
-            providesTags: ["Group"],
+            providesTags: ["GroupList"],
         }),
         getSuggestedGroups: builder.query<Group[], void>({
             query: () => "/groups/suggested",
-            providesTags: ["Group"],
+            providesTags: ["GroupList"],
         }),
         getIncomingGroupRequestsCount: builder.query<{ count: number }, void>({
             query: () => "/groups/requests/count",
@@ -94,7 +94,7 @@ export const groupApiSlice = apiSlice.injectEndpoints({
         }),
         deleteGroup: builder.mutation<{ message: string }, string>({
             query: (id) => ({ url: `/groups/${id}`, method: "DELETE" }),
-            invalidatesTags: ["Group", "Post"],
+            invalidatesTags: ["GroupList", "Post"],
         }),
     }),
 });
