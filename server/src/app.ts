@@ -9,6 +9,7 @@ import chatRoutes from "./modules/chats/chat.routes"
 import groupRoutes from "./modules/groups/group.routes";
 import searchRoutes from "./modules/search/search.routes";
 import notificationRoutes from "./modules/notifications/notification.routes"
+import adminRoutes from "./modules/admin/admin.routes"
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/chats", chatRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin", adminRoutes);
 
 export default app;
