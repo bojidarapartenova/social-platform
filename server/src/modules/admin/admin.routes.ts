@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     getStats, getUsers, setUserRole, deleteUser,
-    getPosts, deletePost, getGroups, deleteGroup,
+    getPosts, deletePost, getGroups, deleteGroup, getComments, deleteComment
 } from "./admin.controller";
 import { requireAuth, requireAdmin } from "../../common/middleware/auth.middleware";
 
@@ -17,5 +17,7 @@ router.get("/posts", getPosts);
 router.delete("/posts/:id", deletePost);
 router.get("/groups", getGroups);
 router.delete("/groups/:id", deleteGroup);
+router.get("/comments", getComments);
+router.delete("/comments/:id", deleteComment);
 
 export default router;

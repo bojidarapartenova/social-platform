@@ -22,7 +22,13 @@ import { NotificationsPage } from "./features/notifications/NotificationsPage";
 import { FollowListPage } from "./features/follows/FollowListPage";
 import { EditGroupForm } from "./features/groups/EditGroupForm";
 import { GroupMembersPage } from "./features/groups/GroupMembersPage";
-
+import AdminRoute from "./routes/AdminRoute";
+import { AdminLayout } from "./features/admin/AdminLayout";
+import { AdminOverviewPage } from "./features/admin/AdminOverviewPage";
+import { AdminUsersPage } from "./features/admin/AdminUsersPage";
+import { AdminPostsPage } from "./features/admin/AdminPostsPage";
+import { AdminGroupsPage } from "./features/admin/AdminGroupsPage";
+import { AdminCommentsPage } from "./features/admin/AdminCommentsPage";
 
 function App() {
   return (
@@ -64,8 +70,19 @@ function App() {
             <Route path="/groups/:id/edit" element={<EditGroupForm />} />
             <Route path="/groups/:id/members" element={<GroupMembersPage />} />
 
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminOverviewPage />} />
+                <Route path="users" element={<AdminUsersPage />} />
+                <Route path="posts" element={<AdminPostsPage />} />
+                <Route path="comments" element={<AdminCommentsPage />} />
+                <Route path="groups" element={<AdminGroupsPage />} />
+              </Route>
+            </Route>
+
           </Route>
         </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

@@ -51,4 +51,13 @@ export class AdminService {
     async deleteGroup(groupId: string) {
         await this.adminRepo.deleteGroupCascade(groupId);
     }
+
+    async getComments(page: number, limit: number) {
+        const [comments, total] = await this.adminRepo.findComments(page, limit);
+        return { comments, total, page, limit };
+    }
+
+    async deleteComment(commentId: string) {
+        await this.adminRepo.deleteCommentCascade(commentId);
+    }
 }

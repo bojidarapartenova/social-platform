@@ -90,6 +90,12 @@ export function Navbar() {
                 </NavLink>
             </nav>
 
+            {currentUser?.role === "admin" && (
+                <NavLink to="/admin" className={({ isActive }) => isActive ? "navItem active" : "navItem"}>
+                    <span>Admin</span>
+                </NavLink>
+            )}
+
             <div className="sidebarFooter">
                 <button type="button" onClick={handleLogout} className="logoutBtn">
                     Log Out

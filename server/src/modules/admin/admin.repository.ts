@@ -67,6 +67,21 @@ export class AdminRepository {
         ]);
     }
 
+    findComments(page: number, limit: number) {
+        return Promise.all([
+            Comment.find()
+                .populate("authorId", "username")
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit),
+            Comment.countDocuments(),
+        ])
+    }
+
+    async deleteCommentCascade(commentId: string) {
+        await Comment.findByIdAndDelete(commentId);
+    }
+
     async deletePostCascade(postId: string) {
         await Promise.all([
             Like.deleteMany({ postId }),

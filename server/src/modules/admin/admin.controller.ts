@@ -86,3 +86,23 @@ export async function deleteGroup(req: Request<{ id: string }>, res: Response) {
         res.status(400).json({ message: error.message });
     }
 }
+
+export async function getComments(req: Request, res: Response) {
+    try {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 20;
+        const result = await adminService.getComments(page, limit);
+        res.status(200).json(result);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+export async function deleteComment(req: Request<{ id: string }>, res: Response) {
+    try {
+        await adminService.deleteComment(req.params.id);
+        res.status(200).json({ message: "Comment deleted" });
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
+}

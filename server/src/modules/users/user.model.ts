@@ -19,7 +19,8 @@ const userSchema = new Schema<IUser>(
         role: { type: String, enum: ["user", "admin"], default: "user" },
         bio: { type: String, default: "" },
         avatarUrl: { type: String, default: "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg" }
-    }
+    },
+    { timestamps: true }
 );
 
 export const User = model<IUser>("User", userSchema);
