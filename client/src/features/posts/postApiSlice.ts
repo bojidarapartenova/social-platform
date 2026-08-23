@@ -1,5 +1,4 @@
 import { apiSlice } from "../../app/apiSlice";
-import { useGetPopularPostsQuery } from "../search/searchApiSlice";
 
 export interface MediaItem {
     url: string;

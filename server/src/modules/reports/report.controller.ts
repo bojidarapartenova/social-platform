@@ -5,6 +5,9 @@ const reportService = new ReportService();
 
 export async function createReport(req: Request, res: Response) {
     try {
+        if (req.user!.role === "admin") {
+            return res.status(403).json({ message: "Admins don't need to file reports" });
+        }
         const { targetType, targetId, reason, details } = req.body;
         const report = await reportService.createReport(req.user!.userId, targetType, targetId, reason, details);
         res.status(201).json(report);

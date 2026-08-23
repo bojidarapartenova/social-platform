@@ -1,6 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
 import "../../styles/admin.css";
-import { isAction } from "@reduxjs/toolkit";
 
 export function AdminLayout() {
     return (
