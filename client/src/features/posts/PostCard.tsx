@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../app/store";
+import { Link, useNavigate } from "react-router-dom";
 import { FilteredImage } from "../feed/FilteredImage";
 import {
     useToggleLikeMutation, useGetCommentsQuery, useAddCommentMutation, useDeleteCommentMutation,
-    useUpdatePostMutation, useDeletePostMutation, useToggleFavoriteMutation,
+    useDeletePostMutation, useToggleFavoriteMutation,
 } from "./postApiSlice";
-import type { Post, MediaItem } from "./postApiSlice";
+import type { Post } from "./postApiSlice";
 import { HashtagText } from "../../components/HashtagText";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { loadDraftFromPost } from "./postDraftSlice";
+import { ReportModal } from "../reports/ReportModal";
 
 function HeartIcon({ filled }: { filled: boolean }) {
     return (
@@ -48,37 +48,25 @@ function StackIcon() {
 export function PostCard({ post, isGroupOwner = false, forceShowComments = false }: { post: Post; isGroupOwner?: boolean; forceShowComments?: boolean }) {
     const currentUserId = useSelector((state: RootState) => state.auth.user?._id);
     const isOwner = currentUserId === post.authorId._id;
+    const isAdmin = useSelector((state: RootState) => state.auth.user?.role === "admin");
     const canDelete = isOwner || isGroupOwner;
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [toggleLike] = useToggleLikeMutation();
     const [toggleFavorite] = useToggleFavoriteMutation();
     const [showComments, setShowComments] = useState(forceShowComments);
     const [showMenu, setShowMenu] = useState(false);
     const [activeSlide, setActiveSlide] = useState(0);
+    const [reportTarget, setReportTarget] = useState<{ type: "post" | "comment"; id: string } | null>(null);
 
-    const [isEditing, setIsEditing] = useState(false);
-    const [editCaption, setEditCaption] = useState(post.caption);
-    const [editMedia, setEditMedia] = useState<MediaItem[]>(post.media ?? []);
-    const [editError, setEditError] = useState("");
-
-    const [updatePost, { isLoading: isSavingEdit }] = useUpdatePostMutation();
     const [deletePost] = useDeletePostMutation();
 
     const { data: comments } = useGetCommentsQuery(post._id, { skip: !showComments });
     const [commentText, setCommentText] = useState("");
     const [addComment] = useAddCommentMutation();
     const [deleteComment] = useDeleteCommentMutation();
-
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-
-    function formatTime(iso: string) {
-        return new Date(iso).toLocaleDateString("en-GB", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-        });
-    }
 
     function handleMediaScroll(e: React.UIEvent<HTMLDivElement>) {
         const el = e.currentTarget;
@@ -92,46 +80,11 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
         setShowMenu(false);
     }
 
-    function updateEditMediaUrl(index: number, value: string) {
-        setEditMedia((prev) => prev.map((m, i) => (i === index ? { ...m, url: value } : m)));
-    }
-
-    function updateEditMediaFilter(index: number, filter: MediaItem["filter"]) {
-        setEditMedia((prev) => prev.map((m, i) => (i === index ? { ...m, filter } : m)));
-    }
-
-    function addEditMediaField() {
-        setEditMedia((prev) => [...prev, { url: "", filter: "none" }]);
-    }
-
-    function removeEditMediaField(index: number) {
-        setEditMedia((prev) => prev.filter((_, i) => i !== index));
-    }
-
-    async function handleSaveEdit() {
-        const cleanedMedia = editMedia.map((m) => ({ ...m, url: m.url.trim() })).filter((m) => m.url);
-        const trimmedCaption = editCaption.trim();
-
-        if (!trimmedCaption && cleanedMedia.length === 0) {
-            setEditError("Write something or add a photo.");
-            return;
-        }
-
-        await updatePost({
-            id: post._id,
-            data: {
-                caption: trimmedCaption,
-                media: cleanedMedia,
-                type: cleanedMedia.length > 0 ? "photo" : "text",
-            },
-        });
-        setIsEditing(false);
-    }
-
     async function handleDelete() {
         if (confirm("Delete this post?")) {
             await deletePost(post._id);
         }
+        setShowMenu(false);
     }
 
     async function handleAddComment(e: React.FormEvent) {
@@ -155,7 +108,7 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                     </Link>
                 )}
 
-                {canDelete && (
+                {(canDelete || (!isOwner && !isAdmin)) && (
                     <div className="postMenu">
                         <button type="button" className="menuBtn" onClick={() => setShowMenu((v) => !v)} aria-label="Post options">
                             ...
@@ -163,50 +116,21 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                         {showMenu && (
                             <div className="menuDropdown">
                                 {isOwner && <button type="button" onClick={startEditing}>Edit</button>}
-                                <button type="button" onClick={handleDelete}>Delete</button>
+                                {canDelete && <button type="button" onClick={handleDelete}>Delete</button>}
+                                {!isOwner && !isAdmin && (
+                                    <button type="button" onClick={() => { setReportTarget({ type: "post", id: post._id }); setShowMenu(false); }}>
+                                        Report
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
                 )}
             </div>
 
-            {isEditing ? (
-                <div className="editBox">
-                    <textarea value={editCaption} onChange={(e) => setEditCaption(e.target.value)} placeholder="What's on your mind?" />
+            <p className="postCaption"><HashtagText text={post.caption} /></p>
 
-                    {editMedia.map((item, i) => (
-                        <div key={i} className="mediaRow">
-                            <input
-                                value={item.url}
-                                onChange={(e) => updateEditMediaUrl(i, e.target.value)}
-                                placeholder={`Image URL ${i + 1}`}
-                            />
-                            <select value={item.filter} onChange={(e) => updateEditMediaFilter(i, e.target.value as MediaItem["filter"])}>
-                                <option value="none">No filter</option>
-                                <option value="negative">Negative</option>
-                                <option value="blur">Blur</option>
-                                <option value="sobel">Sobel</option>
-                            </select>
-                            <button type="button" onClick={() => removeEditMediaField(i)}>Remove</button>
-                        </div>
-                    ))}
-
-                    <button type="button" className="addBtn" onClick={addEditMediaField}>
-                        + Add a photo
-                    </button>
-
-                    {editError && <p className="editError">{editError}</p>}
-
-                    <div className="editActions">
-                        <button type="button" onClick={() => setIsEditing(false)}>Cancel</button>
-                        <button type="button" onClick={handleSaveEdit} disabled={isSavingEdit}>Save</button>
-                    </div>
-                </div>
-            ) : (
-                <p className="postCaption"><HashtagText text={post.caption} /></p>
-            )}
-
-            {!isEditing && post.type === "photo" && post.media?.length > 0 && (
+            {post.type === "photo" && post.media?.length > 0 && (
                 <div className="mediaWrapper">
                     {post.media.length > 1 && (
                         <div className="mediaCountBadge">
@@ -252,20 +176,16 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                 </button>
             </div>
 
-            <span className="chatTime">{formatTime(post.createdAt)}</span>
-
             {showComments && (
                 <div className="commentSection">
                     {comments?.map((c) => (
                         <div key={c._id} className="comment">
-
-                            <Link to={`/profile/${c.authorId._id}`} className="postAuthorLink">
-                                <span className="commentAuthor">{c.authorId.username}</span> {c.text}
-                            </Link>
-
-                            {c.authorId._id === currentUserId && (
+                            <span className="commentAuthor">{c.authorId.username}</span> {c.text}
+                            {c.authorId._id === currentUserId ? (
                                 <button type="button" className="deleteCommentBtn" onClick={() => deleteComment({ id: c._id, postId: post._id })}>✕</button>
-                            )}
+                            ) : !isAdmin ? (
+                                <button type="button" className="deleteCommentBtn" onClick={() => setReportTarget({ type: "comment", id: c._id })}>Report</button>
+                            ) : null}
                         </div>
                     ))}
                     <form className="commentForm" onSubmit={handleAddComment}>
@@ -277,6 +197,14 @@ export function PostCard({ post, isGroupOwner = false, forceShowComments = false
                         <button type="submit">Post</button>
                     </form>
                 </div>
+            )}
+
+            {reportTarget && (
+                <ReportModal
+                    targetType={reportTarget.type}
+                    targetId={reportTarget.id}
+                    onClose={() => setReportTarget(null)}
+                />
             )}
         </div>
     );

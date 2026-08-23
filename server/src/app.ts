@@ -10,6 +10,7 @@ import groupRoutes from "./modules/groups/group.routes";
 import searchRoutes from "./modules/search/search.routes";
 import notificationRoutes from "./modules/notifications/notification.routes"
 import adminRoutes from "./modules/admin/admin.routes"
+import reportRoutes from "./modules/reports/report.routes"
 
 const app = express();
 
@@ -32,5 +33,6 @@ app.use("/api/groups", groupRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reports", reportRoutes);
 
 export default app;

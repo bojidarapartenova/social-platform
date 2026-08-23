@@ -12,6 +12,7 @@ export function AdminLayout() {
                 <NavLink to="/admin/posts" className={({ isActive }) => isActive ? "adminNavItem active" : "adminNavItem"}>Posts</NavLink>
                 <NavLink to="/admin/comments" className={({ isActive }) => isActive ? "adminNavItem active" : "adminNavItem"}>Comments</NavLink>
                 <NavLink to="/admin/groups" className={({ isActive }) => isActive ? "adminNavItem active" : "adminNavItem"}>Groups</NavLink>
+                <NavLink to="/admin/reports" className={({ isActive }) => isActive ? "adminNavItem active" : "adminNavItem"}>Reports</NavLink>
             </aside>
             <main className="adminContent">
                 <Outlet />

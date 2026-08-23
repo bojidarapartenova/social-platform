@@ -1,7 +1,13 @@
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import type { RootState } from "../../app/store";
 import { useGetUserQuery, useGetUserPostsQuery } from "./userApiSlice";
 import { useFollowUserMutation, useUnfollowUserMutation } from "../follows/followApiSlice";
 import { PostCard } from "../posts/PostCard";
+import { HashtagText } from "../../components/HashtagText";
+import { resetDraft } from "../posts/postDraftSlice";
+import { ReportModal } from "../reports/ReportModal";
 import "../../styles/profile.css";
 
 export function ProfilePage() {
@@ -9,16 +15,25 @@ export function ProfilePage() {
     const { data: user, isLoading: userLoading } = useGetUserQuery(id!);
     const { data: posts, isLoading: postsLoading } = useGetUserPostsQuery(id!);
 
+    const isAdmin = useSelector((state: RootState) => state.auth.user?.role === "admin");
+
     const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
     const [unfollowUser, { isLoading: isUnfollowing }] = useUnfollowUserMutation();
 
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [showReportModal, setShowReportModal] = useState(false);
 
     if (userLoading) return <p>Loading profile...</p>;
     if (!user) return <p>User not found.</p>;
 
     function handleEdit() {
         navigate("/profile/edit");
+    }
+
+    function startNewPost() {
+        dispatch(resetDraft());
+        navigate("/create");
     }
 
     function renderActionButton() {
@@ -76,7 +91,7 @@ export function ProfilePage() {
                         <img className="profilePfp" src={user.avatarUrl || "/default-avatar.png"} alt={user.username} />
                     </div>
 
-                    {user.bio && <p className="profileBio">{user.bio}</p>}
+                    {user.bio && <p className="profileBio"><HashtagText text={user.bio} /></p>}
 
                     <div className="profileStats">
                         <Link to={`/profile/${user._id}/followers`}><strong>{user.followerCount}</strong> followers</Link>
@@ -84,13 +99,41 @@ export function ProfilePage() {
                     </div>
 
                     {renderActionButton()}
+
+                    {user.relationshipStatus !== "self" && !isAdmin && (
+                        <button
+                            type="button"
+                            onClick={() => setShowReportModal(true)}
+                            style={{ background: "none", border: "none", color: "var(--color-text-muted)", fontSize: "0.8rem", marginTop: "0.6rem", cursor: "pointer", padding: 0 }}
+                        >
+                            Report this user
+                        </button>
+                    )}
+
+                    {user.relationshipStatus === "self" && (
+                        <div className="postForm" style={{ marginTop: "1rem", border: "none", padding: 0 }}>
+                            <div className="postFormLeft">
+                                <p>What's new?</p>
+                            </div>
+                            <button type="button" onClick={startNewPost} style={{ background: "none", border: "none", fontSize: "1.5rem", cursor: "pointer" }}>+</button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="postList">
                     {postsLoading && <p>Loading posts...</p>}
+                    {posts?.length === 0 && (
+                        <p style={{ textAlign: "center", color: "var(--color-text-muted)", marginTop: "1.5rem" }}>
+                            No posts yet.
+                        </p>
+                    )}
                     {posts?.map((post) => <PostCard key={post._id} post={post} />)}
                 </div>
             </div>
+
+            {showReportModal && (
+                <ReportModal targetType="user" targetId={user._id} onClose={() => setShowReportModal(false)} />
+            )}
         </div>
     );
 }

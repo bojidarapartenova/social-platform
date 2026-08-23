@@ -29,6 +29,7 @@ import { AdminUsersPage } from "./features/admin/AdminUsersPage";
 import { AdminPostsPage } from "./features/admin/AdminPostsPage";
 import { AdminGroupsPage } from "./features/admin/AdminGroupsPage";
 import { AdminCommentsPage } from "./features/admin/AdminCommentsPage";
+import { AdminReportsPage } from "./features/admin/AdminReportsPage";
 
 function App() {
   return (
@@ -77,6 +78,7 @@ function App() {
                 <Route path="posts" element={<AdminPostsPage />} />
                 <Route path="comments" element={<AdminCommentsPage />} />
                 <Route path="groups" element={<AdminGroupsPage />} />
+                <Route path="reports" element={<AdminReportsPage />} />
               </Route>
             </Route>
 

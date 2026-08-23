@@ -87,7 +87,7 @@ export const adminApiSlice = apiSlice.injectEndpoints({
         }),
         deleteCommentAsAdmin: builder.mutation<{ message: string }, string>({
             query: (id) => ({ url: `/admin/comments/${id}`, method: "DELETE" }),
-            invalidatesTags: ["AdminComment", "Comment"],
+            invalidatesTags: ["AdminComment", "Comment", "Post"],
         }),
     }),
 });
