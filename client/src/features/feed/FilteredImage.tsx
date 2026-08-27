@@ -6,7 +6,7 @@ export function FilteredImage({ src, filter }: { src: string; filter: string }) 
     const [useFallbackImg, setUseFallbackImg] = useState(false);
 
     useEffect(() => {
-        setUseFallbackImg(false); // Reset fallback state when source changes
+        setUseFallbackImg(false);
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext("2d", { willReadFrequently: true });
@@ -25,14 +25,12 @@ export function FilteredImage({ src, filter }: { src: string; filter: string }) 
         };
 
         img.onerror = () => {
-            // Trigger fallback on CORS or network load failure
             setUseFallbackImg(true);
         };
 
         img.src = src;
     }, [src, filter]);
 
-    // Fallback: Standard <img> tag ignores CORS restrictions for display
     if (useFallbackImg) {
         return (
             <img
@@ -40,7 +38,6 @@ export function FilteredImage({ src, filter }: { src: string; filter: string }) 
                 alt="Post content"
                 style={{ maxWidth: "100%", display: "block" }}
                 onError={(e) => {
-                    // Show text placeholder if the image URL is completely dead
                     e.currentTarget.style.display = "none";
                 }}
             />
